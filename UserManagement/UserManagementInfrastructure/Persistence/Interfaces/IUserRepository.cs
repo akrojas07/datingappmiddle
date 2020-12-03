@@ -2,15 +2,15 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
-using UserManagementInfrastructure.Repository.Entities;
+using UserManagement.Infrastructure.Persistence.Entities;
 
-namespace UserManagementInfrastructure.Persistence.Interfaces
+namespace UserManagement.Infrastructure.Persistence.Interfaces
 {
-    interface IUserRepository
+    public interface IUserRepository
     {
-        Task<long> CreateNewUser(long userId);
+        Task<long> CreateNewUser(User newUser);
         Task<List<User>> GetAllUsers();
-        Task UpdatePassword(long userId, string password);
+        Task<User> GetUserByUserName(string userName);
         Task UpdateUserProfile(User updatedUser);
         Task DeleteUserAccount(long userId);
     }

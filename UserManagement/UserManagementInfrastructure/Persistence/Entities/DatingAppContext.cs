@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore.Metadata;
 
 #nullable disable
 
-namespace UserManagementInfrastructure.Repository.Entities
+namespace UserManagement.Infrastructure.Persistence.Entities
 {
     public partial class DatingAppContext : DbContext
     {
