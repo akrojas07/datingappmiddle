@@ -24,6 +24,7 @@ namespace UserManagement.Infrastructure.Persistence.Repositories
                     throw new Exception("User not provided");
                 }
 
+                newUser.Status = true;
                 newUser.CreatedDate = DateTime.Now;
                 newUser.UpdatedDate = DateTime.Now;
 
@@ -82,6 +83,26 @@ namespace UserManagement.Infrastructure.Persistence.Repositories
             }
         }
 
+        /// <summary>
+        /// Repository method to update a user's login / logout status 
+        /// </summary>
+        /// <param name="userName">Username</param>
+        /// <returns>Completed Task</returns>
+        public async Task UpdateUserStatus(long userId, bool status)
+        {
+            using(var context = new DatingAppContext())
+            {
+                //pull user account
+                var user = await context.Users.FirstOrDefaultAsync(u => u.Id == userId);
+                
+                //update status 
+                user.Status = status;
+
+                await context.SaveChangesAsync();
+
+            }
+        }
+
 
         /// <summary>
         /// Repository method to update individual user's profile
@@ -98,7 +119,6 @@ namespace UserManagement.Infrastructure.Persistence.Repositories
                 userProfile.FirstName = updatedUser.FirstName;
                 userProfile.LastName = updatedUser.LastName;
                 userProfile.Password = updatedUser.Password;
-                userProfile.Username = updatedUser.Username;
                 userProfile.UpdatedDate = DateTime.Now;
 
                 await context.SaveChangesAsync();

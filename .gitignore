@@ -1,0 +1,14 @@
+
+UserManagement/UserManagementAPI/bin/
+
+UserManagement/UserManagementAPI/obj/
+
+UserManagement/UserManagementInfrastructure/bin/
+
+UserManagement/UserManagementInfrastructure/obj/
+
+UserManagement/UserManagement.Test/bin/
+
+UserManagement/UserManagement.Test/obj/
+
+UserManagement/.vs/

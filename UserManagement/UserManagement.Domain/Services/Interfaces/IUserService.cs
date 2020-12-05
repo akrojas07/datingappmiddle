@@ -11,6 +11,8 @@ namespace UserManagement.Domain.Services.Interfaces
         Task<long> CreateNewUser(UserModel newUser);
         Task<List<UserModel>> GetAllUsers();
         Task UpdateUserProfile(UserModel updatedUser);
-        Task DeleteUserAccount(long userId);
+        Task DeleteUserAccount(string userName);
+        Task<string> Login(string userName, string password);
+        Task Logout(string userName);
     }
 }

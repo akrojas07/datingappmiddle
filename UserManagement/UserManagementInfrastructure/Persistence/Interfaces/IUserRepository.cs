@@ -13,5 +13,6 @@ namespace UserManagement.Infrastructure.Persistence.Interfaces
         Task<User> GetUserByUserName(string userName);
         Task UpdateUserProfile(User updatedUser);
         Task DeleteUserAccount(long userId);
+        Task UpdateUserStatus(long userId, bool status);
     }
 }

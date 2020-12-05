@@ -53,6 +53,7 @@ namespace UserManagement.Domain.Services
             }
             else
             {
+                //if input isn't valid, throw exception
                 throw new Exception("Invalid User");
             }
         }
@@ -62,9 +63,25 @@ namespace UserManagement.Domain.Services
         /// </summary>
         /// <param name="userId">User Id</param>
         /// <returns>Completed task</returns>
-        public async Task DeleteUserAccount(long userId)
+        public async Task DeleteUserAccount(string userName)
         {
-            throw new NotImplementedException();
+            //validate input
+            if (userName == null)
+            {
+                throw new Exception("User not provided");
+            }
+
+            //pull user account
+            var user = await _userRepository.GetUserByUserName(userName);
+
+            //validate return
+            if(user == null)
+            {
+                throw new Exception("User not found");
+            }
+
+            //delete user account
+            await _userRepository.DeleteUserAccount(user.Id);
         }
 
         /// <summary>
@@ -79,15 +96,86 @@ namespace UserManagement.Domain.Services
             //pull all users from db
             var dbUsers = await _userRepository.GetAllUsers();
 
-            //map each db user to Domain Model and add to domain users list
-            foreach(var dbUser in dbUsers)
+            if(dbUsers != null) 
             {
-                allUsers.Add(EfUserMapper.DbEntityToCoreModel(dbUser));
+                //map each db user to Domain Model and add to domain users list
+                foreach (var dbUser in dbUsers)
+                {
+                    allUsers.Add(EfUserMapper.DbEntityToCoreModel(dbUser));
+                }
             }
+            else
+            {
+                throw new Exception("No Users found");
+            }
+
 
             //return domain users list
             return allUsers;
         }
+
+        /// <summary>
+        /// Service method to log a user in
+        /// </summary>
+        /// <param name="userName">Username</param>
+        /// <param name="password">Password</param>
+        /// <returns>username</returns>
+        public async Task<string> Login(string userName, string password)
+        {
+            //validate inputs
+            if(userName == null || password == null)
+            {
+                throw new Exception("Invalid input");
+            }
+
+            //pull user account
+            var user = await _userRepository.GetUserByUserName(userName);
+
+            //validate user exists
+            if(user == null)
+            {
+                throw new Exception("Invalid user");
+            }
+
+            //if user exists validate passwords match
+            if(user.Password != password)
+            {
+                throw new Exception("Invalid password");
+            }
+
+            //if passwords match, update user status 
+            await _userRepository.UpdateUserStatus(user.Id, true);
+
+            return userName;
+        }
+
+        /// <summary>
+        /// Service method to log a user out
+        /// </summary>
+        /// <param name="userName">Username</param>
+        /// <returns>Completed task</returns>
+        public async Task Logout(string userName)
+        {
+            //validate inputs
+            if (userName == null)
+            {
+                throw new Exception("Invalid input");
+            }
+
+            //pull user account
+            var user = await _userRepository.GetUserByUserName(userName);
+
+            //validate user exists
+            if (user == null)
+            {
+                throw new Exception("Invalid user");
+            }
+
+            //if user is valid
+            await _userRepository.UpdateUserStatus(user.Id, false);
+
+        }
+
         /// <summary>
         /// Service method to update individual user profile information
         /// </summary>
@@ -134,7 +222,7 @@ namespace UserManagement.Domain.Services
         {
             bool result;
 
-            if(coreUser == null)
+            if (coreUser == null)
             {
                 result = false;
             }
@@ -151,10 +239,6 @@ namespace UserManagement.Domain.Services
                 result = false;
             }
             else if(coreUser.Username == null)
-            {
-                result = false;
-            }
-            else if(coreUser.Id == 0)
             {
                 result = false;
             }
