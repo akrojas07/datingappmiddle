@@ -118,7 +118,7 @@ namespace UserManagement.Test.APITests
                 .Returns(Task.CompletedTask);
 
             var controller = new UserController(_userService.Object, _config.Object);
-            var response = await controller.DeleteUser(null , null);
+            var response = await controller.DeleteUser(null, null);
 
             Assert.NotNull(response);
             Assert.AreEqual(400, ((ObjectResult)response).StatusCode);
@@ -128,10 +128,198 @@ namespace UserManagement.Test.APITests
         public async Task Test_DeleteUserAccountController_Fail_InternalError()
         {
             _userService.Setup(u => u.DeleteUserAccount(It.IsAny<string>()))
-                .ThrowsAsync(new Exception()) ;
+                .ThrowsAsync(new Exception());
 
             var controller = new UserController(_userService.Object, _config.Object);
             var response = await controller.DeleteUser("username", null);
+
+            Assert.NotNull(response);
+            Assert.AreEqual(500, ((ObjectResult)response).StatusCode);
+        }
+
+        [Test]
+        public async Task Test_GetAllUsersByUserId_Success()
+        {
+            _userService.Setup(u => u.GetUsersByUserId(It.IsAny<List<long>>()))
+                .ReturnsAsync(new List<UserModel>()
+                {
+                    new UserModel
+                    {
+                        Username="username",
+                        FirstName ="firstname",
+                        LastName = "lastname",
+                        Password = "password",
+                        Id = 1
+                    },
+                    new UserModel
+                    {
+                        Username="username",
+                        FirstName ="firstname",
+                        LastName = "lastname",
+                        Password = "password",
+                        Id = 2
+                    }
+                });
+
+            var controller = new UserController(_userService.Object, _config.Object);
+            var response = await controller.GetUsersByUserId(new List<long>() { 1, 2, 3, 4 });
+
+            Assert.NotNull(response);
+            Assert.AreEqual(200, ((ObjectResult)response).StatusCode);
+        }
+
+        [Test]
+        public async Task Test_GetAllUsersByUserId_Fail_EmptyInputList()
+        {
+            var controller = new UserController(_userService.Object, _config.Object);
+            var response = await controller.GetUsersByUserId(new List<long>() {});
+
+            Assert.NotNull(response);
+            Assert.AreEqual(400, ((ObjectResult)response).StatusCode);
+        }
+
+        [Test]
+        public async Task Test_GetUsersByUserId_Fail_NoDbUsers()
+        {
+            var controller = new UserController(_userService.Object, _config.Object);
+            var response = await controller.GetUsersByUserId(new List<long>() { 1, 2, 3, 4 });
+
+            Assert.NotNull(response);
+            Assert.AreEqual(500, ((ObjectResult)response).StatusCode);
+        }
+
+        [Test]
+        public async Task Test_Login_Success()
+        {
+            _userService.Setup(u => u.Login(It.IsAny<string>(), It.IsAny<string>()))
+                .ReturnsAsync("username");
+
+            var controller = new UserController(_userService.Object, _config.Object);
+            var response = await controller.Login("username", "password");
+
+            Assert.NotNull(response);
+            Assert.AreEqual(200, ((ObjectResult)response).StatusCode);
+        }
+
+        [Test]
+        public async Task Test_Login_Fail_NullUsernameInput()
+        {
+            var controller = new UserController(_userService.Object, _config.Object);
+            var response = await controller.Login(null, "password");
+
+            Assert.NotNull(response);
+            Assert.AreEqual(400, ((ObjectResult)response).StatusCode);
+        }
+
+        [Test]
+        public async Task Test_Login_Fail_InternalError()
+        {
+            _userService.Setup(u => u.Login(It.IsAny<string>(), It.IsAny<string>()))
+                .ThrowsAsync(new Exception("Exception"));
+
+            var controller = new UserController(_userService.Object, _config.Object);
+            var response = await controller.Login("username", "password");
+
+            Assert.NotNull(response);
+            Assert.AreEqual(500, ((ObjectResult)response).StatusCode);
+
+        }
+
+        [Test]
+        public async Task Test_Logout_Success()
+        {
+            _userService.Setup(u => u.Logout(It.IsAny<string>()))
+                .Returns(Task.CompletedTask);
+
+            var controller = new UserController(_userService.Object, _config.Object);
+            var response = await controller.Logout("username");
+
+            Assert.NotNull(response);
+            Assert.AreEqual(200, ((OkResult)response).StatusCode);
+        }
+
+        [Test]
+        public async Task Test_Logout_Fail_NullUsername()
+        {
+            var controller = new UserController(_userService.Object, _config.Object);
+            var response = await controller.Logout(null);
+
+            Assert.NotNull(response);
+            Assert.AreEqual(400, ((ObjectResult)response).StatusCode);
+        }
+
+        [Test]
+        public async Task Test_Logout_Fail_InternalError()
+        {
+            _userService.Setup(u => u.Logout(It.IsAny<string>()))
+                .ThrowsAsync(new Exception("Internal Exception"));
+
+            var controller = new UserController(_userService.Object, _config.Object);
+            var response = await controller.Logout("username");
+
+            Assert.NotNull(response);
+            Assert.AreEqual(500, ((ObjectResult)response).StatusCode);
+        }
+
+        [Test]
+        public async Task Test_UpdateProfile_Success()
+        {
+            _userService.Setup(u => u.UpdateUserProfile(It.IsAny<UserModel>()))
+                .Returns(Task.CompletedTask);
+
+            var controller = new UserController(_userService.Object, _config.Object);
+            var response = await controller.UpdateProfile(new UpdateUserRequest()
+            {
+                FirstName = "firstname",
+                LastName = "lastname",
+                Username= "username",
+                Password = "password"
+            });
+
+            Assert.NotNull(response);
+            Assert.AreEqual(200, ((OkResult)response).StatusCode);
+        }
+
+        [Test]
+        public async Task Test_UpdateProfile_Fail_NullInputs()
+        {
+            var controller = new UserController(_userService.Object, _config.Object);
+            var response = await controller.UpdateProfile(null);
+
+            Assert.NotNull(response);
+            Assert.AreEqual(400, ((ObjectResult)response).StatusCode);
+
+        }
+
+        [Test]
+        public async Task Test_UpdateProfile_Fail_NullRequiredInput()
+        {
+            var controller = new UserController(_userService.Object, _config.Object);
+            var response = await controller.UpdateProfile(new UpdateUserRequest()
+            {
+                FirstName = "firstname",
+                Username = "username",
+                Password = "password"
+            });
+
+            Assert.NotNull(response);
+            Assert.AreEqual(400, ((ObjectResult)response).StatusCode);
+        }
+
+        [Test]
+        public async Task Test_UpdateProfile_Fail_InternalError()
+        {
+            _userService.Setup(u => u.UpdateUserProfile(It.IsAny<UserModel>()))
+                .ThrowsAsync(new Exception("Internal Exception"));
+
+            var controller = new UserController(_userService.Object, _config.Object);
+            var response = await controller.UpdateProfile(new UpdateUserRequest()
+            {
+                FirstName = "firstname",
+                LastName = "lastname",
+                Username = "username",
+                Password = "password"
+            });
 
             Assert.NotNull(response);
             Assert.AreEqual(500, ((ObjectResult)response).StatusCode);

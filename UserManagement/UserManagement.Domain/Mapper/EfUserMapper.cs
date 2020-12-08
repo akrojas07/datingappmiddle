@@ -26,7 +26,6 @@ namespace UserManagement.Domain.Mapper
         {
             DbEntity dbEntity = new DbEntity()
             {
-                Id = coreModel.Id,
                 FirstName = coreModel.FirstName,
                 LastName = coreModel.LastName,
                 Username = coreModel.Username,
