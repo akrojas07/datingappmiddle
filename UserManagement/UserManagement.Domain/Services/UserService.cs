@@ -22,7 +22,7 @@ namespace UserManagement.Domain.Services
         /// </summary>
         /// <param name="newUser">User Model</param>
         /// <returns>User Id </returns>
-        public async Task<long> CreateNewUser(UserModel newUser)
+        public async Task<string> CreateNewUser(UserModel newUser)
         {
             //validate new user 
             bool validUser = ValidateUser(newUser);
@@ -42,10 +42,10 @@ namespace UserManagement.Domain.Services
                 catch
                 {
                     //if user doesn't exist, create new user and store user id in userId
-                    var userId = await _userRepository.CreateNewUser(EfUserMapper.CoreModelToDbEntity(newUser));
+                    var userName = await _userRepository.CreateNewUser(EfUserMapper.CoreModelToDbEntity(newUser));
 
                     //return user id
-                    return userId;
+                    return userName;
                 }
 
                 // if user exists, throw exception
@@ -85,16 +85,17 @@ namespace UserManagement.Domain.Services
         }
 
         /// <summary>
-        /// Service method to pull all users from database
+        /// Service method to pull users from database by User Id
         /// </summary>
+        /// <param name="userIds">List of User Ids</param>
         /// <returns>List of Domain Model Users</returns>
-        public async Task<List<UserModel>> GetAllUsers()
+        public async Task<List<UserModel>> GetUsersByUserId(List<long> userIds)
         {
             //create empty list of domain users 
             List<UserModel> allUsers = new List<UserModel>();
 
             //pull all users from db
-            var dbUsers = await _userRepository.GetAllUsers();
+            var dbUsers = await _userRepository.GetUsersByUserId(userIds);
 
             if(dbUsers != null) 
             {

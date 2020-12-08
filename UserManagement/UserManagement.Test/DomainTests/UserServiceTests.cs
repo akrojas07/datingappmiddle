@@ -28,7 +28,7 @@ namespace UserManagement.Test.DomainTests
         {
             _userRepository.Setup(u => u.GetUserByUserName(It.IsAny<string>()));
             _userRepository.Setup(u => u.CreateNewUser(It.IsAny<User>()))
-                .ReturnsAsync(1);
+                .ReturnsAsync("username");
 
             var userService = new UserService(_userRepository.Object);
             await userService.CreateNewUser(new UserModel()
@@ -141,28 +141,28 @@ namespace UserManagement.Test.DomainTests
         }
 
         [Test]
-        public async Task Test_GetAllUsers_Success()
+        public async Task Test_GetUsersByUserId_Success()
         {
-            _userRepository.Setup(u => u.GetAllUsers())
+            _userRepository.Setup(u => u.GetUsersByUserId(It.IsAny<List<long>>()))
                 .ReturnsAsync(new List<User>()
                 {
                     {new User(){ FirstName = "Boonie", LastName="Cl"} }
                 });
 
             var userService = new UserService(_userRepository.Object);
-            await userService.GetAllUsers();
+            await userService.GetUsersByUserId(new List<long>() { 1 });
 
-            _userRepository.Verify(u => u.GetAllUsers(), Times.Once);
+            _userRepository.Verify(u => u.GetUsersByUserId(It.IsAny<List<long>>()), Times.Once);
         }
 
         [Test]
-        public void Test_GetAllUsers_Fail_NoUsers()
+        public void Test_GetUsersByUserId_Fail_NoUsers()
         {
-            _userRepository.Setup(u => u.GetAllUsers());
+            _userRepository.Setup(u => u.GetUsersByUserId(It.IsAny<List<long>>()));
             var userService = new UserService(_userRepository.Object);
-            Assert.ThrowsAsync<Exception>(() => userService.GetAllUsers());
+            Assert.ThrowsAsync<Exception>(() => userService.GetUsersByUserId(new List<long>() { 0 }));
 
-            _userRepository.Verify(u => u.GetAllUsers(), Times.Once);
+            _userRepository.Verify(u => u.GetUsersByUserId(It.IsAny<List<long>>()), Times.Once);
         }
 
         [Test]

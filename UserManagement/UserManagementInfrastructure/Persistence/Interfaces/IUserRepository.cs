@@ -8,8 +8,8 @@ namespace UserManagement.Infrastructure.Persistence.Interfaces
 {
     public interface IUserRepository
     {
-        Task<long> CreateNewUser(User newUser);
-        Task<List<User>> GetAllUsers();
+        Task<string> CreateNewUser(User newUser);
+        Task<List<User>> GetUsersByUserId(List<long> userIds);
         Task<User> GetUserByUserName(string userName);
         Task UpdateUserProfile(User updatedUser);
         Task DeleteUserAccount(long userId);

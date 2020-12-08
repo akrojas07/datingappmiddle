@@ -14,10 +14,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="APITests\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\UserManagement.Domain\UserManagement.Domain.csproj" />
     <ProjectReference Include="..\UserManagementAPI\UserManagement.API.csproj" />
     <ProjectReference Include="..\UserManagementInfrastructure\UserManagement.Infrastructure.csproj" />

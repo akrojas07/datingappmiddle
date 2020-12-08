@@ -8,8 +8,8 @@ namespace UserManagement.Domain.Services.Interfaces
 {
     public interface IUserService
     {
-        Task<long> CreateNewUser(UserModel newUser);
-        Task<List<UserModel>> GetAllUsers();
+        Task<string> CreateNewUser(UserModel newUser);
+        Task<List<UserModel>> GetUsersByUserId(List<long> userIds);
         Task UpdateUserProfile(UserModel updatedUser);
         Task DeleteUserAccount(string userName);
         Task<string> Login(string userName, string password);

@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using UserManagement.Infrastructure.Persistence.Interfaces;
 using UserManagement.Infrastructure.Persistence.Entities;
+using System.Linq;
 
 namespace UserManagement.Infrastructure.Persistence.Repositories
 {
@@ -14,7 +15,7 @@ namespace UserManagement.Infrastructure.Persistence.Repositories
         /// </summary>
         /// <param name="newUser">Repository User Entity</param>
         /// <returns>User Id as long</returns>
-        public async Task<long> CreateNewUser(User newUser)
+        public async Task<string> CreateNewUser(User newUser)
         {
 
             using (var context = new DatingAppContext())
@@ -30,7 +31,7 @@ namespace UserManagement.Infrastructure.Persistence.Repositories
 
                 context.Users.Add(newUser);
                 await context.SaveChangesAsync();
-                return newUser.Id; 
+                return newUser.Username; 
             }
         }
 
@@ -53,18 +54,15 @@ namespace UserManagement.Infrastructure.Persistence.Repositories
         }
 
         /// <summary>
-        /// Repository method to pull all users from database
+        /// Repository method to pull list of users from database by userId
         /// </summary>
+        /// <param name="userIds">List of User Ids</param>
         /// <returns>List of Users Entity</returns>
-        public async Task<List<User>> GetAllUsers()
+        public async Task<List<User>> GetUsersByUserId(List<long> userIds)
         {
             using (var context = new DatingAppContext())
             {
-                List<User> allUsers = new List<User>();
-
-                allUsers = await context.Users.ToListAsync();
-
-                return allUsers;
+                return await context.Users.Where(u => userIds.Any(id => u.Id == id)).ToListAsync();
             }
         }
 
