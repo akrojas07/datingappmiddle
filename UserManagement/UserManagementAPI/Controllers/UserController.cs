@@ -147,7 +147,7 @@ namespace UserManagement.API.Controllers
 
         [HttpPatch]
         [Route("login")]
-        [Authorize]
+        [AllowAnonymous]
         public async Task<IActionResult> Login([FromBody] string username, [FromBody] string password)
         {
             //validate inputs
