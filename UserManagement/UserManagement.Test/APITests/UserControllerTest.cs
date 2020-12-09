@@ -92,23 +92,10 @@ namespace UserManagement.Test.APITests
                 .Returns(Task.CompletedTask);
 
             var controller = new UserController(_userService.Object, _config.Object);
-            var response = await controller.DeleteUser("username", null);
+            var response = await controller.DeleteUser("username", "password");
 
             Assert.NotNull(response);
             Assert.AreEqual(200, ((StatusCodeResult)response).StatusCode);
-        }
-
-        [Test]
-        public async Task Test_DeleteUserAccountController_Fail_WrongToken()
-        {
-            _userService.Setup(u => u.DeleteUserAccount(It.IsAny<string>()))
-                .Returns(Task.CompletedTask);
-
-            var controller = new UserController(_userService.Object, _config.Object);
-            var response = await controller.DeleteUser("username", "55");
-
-            Assert.NotNull(response);
-            Assert.AreEqual(401, ((StatusCodeResult)response).StatusCode);
         }
 
         [Test]

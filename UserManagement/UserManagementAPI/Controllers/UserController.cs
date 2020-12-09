@@ -77,19 +77,13 @@ namespace UserManagement.API.Controllers
         /// <returns>Task completed</returns>
         [HttpDelete]
         [Route("delete/{username}")]
+        [Authorize]
         public async Task<IActionResult> DeleteUser(string username, string token)
         {
             //validate username is not empty
             if (username == null)
             {
                 return StatusCode(400, "User not provided");
-            }
-
-            //validate token
-            if (_tokenstring != token)
-            {
-                //if token doesn't match, return unauthorized 
-                return StatusCode(401);
             }
 
             try
@@ -112,6 +106,7 @@ namespace UserManagement.API.Controllers
         /// <returns>List of users</returns>
 
         [HttpGet]
+        [Authorize]
         public async Task<IActionResult> GetUsersByUserId(List<long> userIds)
         {
             //validate empty list was not passed into method
@@ -152,6 +147,7 @@ namespace UserManagement.API.Controllers
 
         [HttpPatch]
         [Route("login")]
+        [Authorize]
         public async Task<IActionResult> Login([FromBody] string username, [FromBody] string password)
         {
             //validate inputs
@@ -181,6 +177,7 @@ namespace UserManagement.API.Controllers
 
         [HttpPatch]
         [Route("logout")]
+        [Authorize]
         public async Task<IActionResult> Logout([FromBody] string username)
         {
             //validate username is not null
@@ -209,6 +206,7 @@ namespace UserManagement.API.Controllers
 
         [HttpPut]
         [Route("update/profile")]
+        [Authorize]
         public async Task<IActionResult> UpdateProfile([FromBody] UpdateUserRequest updateUser)
         {
             //validate user entry
