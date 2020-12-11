@@ -112,7 +112,7 @@ namespace UserManagement.Infrastructure.Persistence.Repositories
         {
             using (var context = new DatingAppContext())
             {
-                var userProfile = await context.Users.FirstOrDefaultAsync(u => u.Id == updatedUser.Id);
+                var userProfile = await context.Users.FirstOrDefaultAsync(u => u.Username == updatedUser.Username);
 
                 userProfile.FirstName = updatedUser.FirstName;
                 userProfile.LastName = updatedUser.LastName;

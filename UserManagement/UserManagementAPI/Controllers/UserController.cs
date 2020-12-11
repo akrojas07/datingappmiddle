@@ -12,16 +12,17 @@ using System.Text;
 using Microsoft.Extensions.Configuration;
 using System.IdentityModel.Tokens.Jwt;
 using UserManagement.Domain.Models;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 namespace UserManagement.API.Controllers
 {
     [Route("/user")]
     [ApiController]
+    [Authorize]
     public class UserController : ControllerBase
     {
         private readonly IUserService _userService;
         private readonly IConfiguration _config;
-        private string _tokenstring;
 
         public UserController(IUserService userService, IConfiguration config)
         {
@@ -59,9 +60,9 @@ namespace UserManagement.API.Controllers
 
                 //pass model user into service and generate JSON Token 
                 var username = await _userService.CreateNewUser(modelUser);
-                _tokenstring = GenerateJsonWebToken();
+                var tokenstring = GenerateJsonWebToken();
 
-                return StatusCode(201, new { un = username, token = _tokenstring });
+                return StatusCode(201, new { un = username, token = tokenstring });
             }
             catch (Exception e)
             {
@@ -73,12 +74,11 @@ namespace UserManagement.API.Controllers
         /// Controller method to delete existing user
         /// </summary>
         /// <param name="username">Username as string</param>
-        /// <param name="token">Token as string</param>
         /// <returns>Task completed</returns>
         [HttpDelete]
         [Route("delete/{username}")]
-        [Authorize]
-        public async Task<IActionResult> DeleteUser(string username, string token)
+
+        public async Task<IActionResult> DeleteUser(string username)
         {
             //validate username is not empty
             if (username == null)
@@ -105,12 +105,12 @@ namespace UserManagement.API.Controllers
         /// <param name="userIds">List of long user ids</param>
         /// <returns>List of users</returns>
 
-        [HttpGet]
-        [Authorize]
-        public async Task<IActionResult> GetUsersByUserId(List<long> userIds)
+        [HttpPut]
+
+        public async Task<IActionResult> GetUsersByUserId([FromBody] GetUsersByUserIdRequest userIds)
         {
             //validate empty list was not passed into method
-            if(userIds.Count <= 0)
+            if(userIds.UserIds.Count <= 0)
             {
                 return StatusCode(400, "Users not provided");
             }
@@ -121,7 +121,7 @@ namespace UserManagement.API.Controllers
                 List<UserModel> users = new List<UserModel>();
 
                 //call get method and store returned users in list
-                users = await _userService.GetUsersByUserId(userIds);
+                users = await _userService.GetUsersByUserId(userIds.UserIds);
 
                 //validate list is not empty 
                 if(users.Count <= 0)
@@ -148,21 +148,22 @@ namespace UserManagement.API.Controllers
         [HttpPatch]
         [Route("login")]
         [AllowAnonymous]
-        public async Task<IActionResult> Login([FromBody] string username, [FromBody] string password)
+        public async Task<IActionResult> Login([FromBody] LoginUserRequest loginUser)
         {
             //validate inputs
-            if(username == null || password == null)
+            if(loginUser.Username == null || loginUser.Password == null)
             {
                 return StatusCode(400, "Username or password not provided");
             }
 
             try
             {
-                //call login service method 
-                var user = await _userService.Login(username, password);
+                //call login service method and generate JSON token
+                var user = await _userService.Login(loginUser.Username, loginUser.Password);
+                var tokenstring = GenerateJsonWebToken();
 
-                //return username
-                return StatusCode(200, user);
+                //return username and token
+                return StatusCode(200, new { un = user, token = tokenstring });
             }
             catch(Exception e)
             {
@@ -177,11 +178,11 @@ namespace UserManagement.API.Controllers
 
         [HttpPatch]
         [Route("logout")]
-        [Authorize]
-        public async Task<IActionResult> Logout([FromBody] string username)
+
+        public async Task<IActionResult> Logout([FromBody] LogoutRequest logoutRequest)
         {
             //validate username is not null
-            if(username == null)
+            if(logoutRequest.Username == null)
             {
                 return StatusCode(400,"Username invalid");
             }
@@ -189,7 +190,7 @@ namespace UserManagement.API.Controllers
             try
             {
                 //call logout service method
-                await _userService.Logout(username);
+                await _userService.Logout(logoutRequest.Username);
 
                 return Ok();
             }
@@ -206,7 +207,7 @@ namespace UserManagement.API.Controllers
 
         [HttpPut]
         [Route("update/profile")]
-        [Authorize]
+
         public async Task<IActionResult> UpdateProfile([FromBody] UpdateUserRequest updateUser)
         {
             //validate user entry

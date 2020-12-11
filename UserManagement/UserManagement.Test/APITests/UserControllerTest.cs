@@ -92,7 +92,7 @@ namespace UserManagement.Test.APITests
                 .Returns(Task.CompletedTask);
 
             var controller = new UserController(_userService.Object, _config.Object);
-            var response = await controller.DeleteUser("username", "password");
+            var response = await controller.DeleteUser("username");
 
             Assert.NotNull(response);
             Assert.AreEqual(200, ((StatusCodeResult)response).StatusCode);
@@ -105,7 +105,7 @@ namespace UserManagement.Test.APITests
                 .Returns(Task.CompletedTask);
 
             var controller = new UserController(_userService.Object, _config.Object);
-            var response = await controller.DeleteUser(null, null);
+            var response = await controller.DeleteUser(null);
 
             Assert.NotNull(response);
             Assert.AreEqual(400, ((ObjectResult)response).StatusCode);
@@ -118,7 +118,7 @@ namespace UserManagement.Test.APITests
                 .ThrowsAsync(new Exception());
 
             var controller = new UserController(_userService.Object, _config.Object);
-            var response = await controller.DeleteUser("username", null);
+            var response = await controller.DeleteUser("username");
 
             Assert.NotNull(response);
             Assert.AreEqual(500, ((ObjectResult)response).StatusCode);
@@ -182,7 +182,7 @@ namespace UserManagement.Test.APITests
                 .ReturnsAsync("username");
 
             var controller = new UserController(_userService.Object, _config.Object);
-            var response = await controller.Login("username", "password");
+            var response = await controller.Login(new LoginUserRequest() { Username = "username", Password = "password"});
 
             Assert.NotNull(response);
             Assert.AreEqual(200, ((ObjectResult)response).StatusCode);
@@ -192,7 +192,7 @@ namespace UserManagement.Test.APITests
         public async Task Test_Login_Fail_NullUsernameInput()
         {
             var controller = new UserController(_userService.Object, _config.Object);
-            var response = await controller.Login(null, "password");
+            var response = await controller.Login(new LoginUserRequest() { Username = null, Password = "password" });
 
             Assert.NotNull(response);
             Assert.AreEqual(400, ((ObjectResult)response).StatusCode);
@@ -205,7 +205,7 @@ namespace UserManagement.Test.APITests
                 .ThrowsAsync(new Exception("Exception"));
 
             var controller = new UserController(_userService.Object, _config.Object);
-            var response = await controller.Login("username", "password");
+            var response = await controller.Login(new LoginUserRequest() { Username = "username", Password = "password" });
 
             Assert.NotNull(response);
             Assert.AreEqual(500, ((ObjectResult)response).StatusCode);
