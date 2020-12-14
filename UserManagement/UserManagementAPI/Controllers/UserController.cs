@@ -81,7 +81,7 @@ namespace UserManagement.API.Controllers
         public async Task<IActionResult> DeleteUser(string username)
         {
             //validate username is not empty
-            if (username == null)
+            if (username == null || username == "")
             {
                 return StatusCode(400, "User not provided");
             }

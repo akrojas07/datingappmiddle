@@ -12,3 +12,7 @@ UserManagement/UserManagement.Test/bin/
 UserManagement/UserManagement.Test/obj/
 
 UserManagement/.vs/
+
+UserManagement/UserManagement.Domain/bin/
+
+UserManagement/UserManagement.Domain/obj/
