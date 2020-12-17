@@ -59,10 +59,10 @@ namespace UserManagement.API.Controllers
                 };
 
                 //pass model user into service and generate JSON Token 
-                var username = await _userService.CreateNewUser(modelUser);
+                var user = await _userService.CreateNewUser(modelUser);
                 var tokenstring = GenerateJsonWebToken();
 
-                return StatusCode(201, new { un = username, token = tokenstring });
+                return StatusCode(201, new { un = user.Username, fn = user.FirstName, ln = user.LastName, token = tokenstring });
             }
             catch (Exception e)
             {
@@ -99,6 +99,7 @@ namespace UserManagement.API.Controllers
             }
 
         }
+
         /// <summary>
         /// Controller method to pull list of users by user id based on provided list
         /// </summary>
@@ -163,7 +164,7 @@ namespace UserManagement.API.Controllers
                 var tokenstring = GenerateJsonWebToken();
 
                 //return username and token
-                return StatusCode(200, new { un = user, token = tokenstring });
+                return StatusCode(200, new { un = user.Username, fn = user.FirstName, ln = user.LastName, token = tokenstring });
             }
             catch(Exception e)
             {

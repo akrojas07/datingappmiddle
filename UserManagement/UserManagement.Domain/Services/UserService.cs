@@ -22,7 +22,7 @@ namespace UserManagement.Domain.Services
         /// </summary>
         /// <param name="newUser">User Model</param>
         /// <returns>User Id </returns>
-        public async Task<string> CreateNewUser(UserModel newUser)
+        public async Task<UserModel> CreateNewUser(UserModel newUser)
         {
             //validate new user 
             bool validUser = ValidateUser(newUser);
@@ -41,11 +41,14 @@ namespace UserManagement.Domain.Services
                 }
                 catch
                 {
-                    //if user doesn't exist, create new user and store user id in userId
-                    var userName = await _userRepository.CreateNewUser(EfUserMapper.CoreModelToDbEntity(newUser));
+                    //if user doesn't exist, create new user 
+                    var createdUser = await _userRepository.CreateNewUser(EfUserMapper.CoreModelToDbEntity(newUser));
 
-                    //return user id
-                    return userName;
+                    //map db user to domain user
+                    var newDomainUser = EfUserMapper.DbEntityToCoreModel(createdUser);
+
+                    //return newly created user
+                    return newDomainUser;
                 }
 
                 // if user exists, throw exception
@@ -85,6 +88,38 @@ namespace UserManagement.Domain.Services
         }
 
         /// <summary>
+        /// Service method to pull single user by username
+        /// </summary>
+        /// <param name="username">Username as string</param>
+        /// <returns>Domain Model User</returns>
+        public async Task<UserModel> GetUserByUsername(string username)
+        {
+            //validate parameter is not null or empty
+            if(username == null || username == "")
+            {
+                throw new ArgumentException("Username not provided");
+            }
+
+            //create new domain user
+            UserModel user = new UserModel();
+
+            //pull user from db
+            var dbuser = await _userRepository.GetUserByUserName(username);
+
+            //validate db call returned user
+            if(dbuser == null)
+            {
+                throw new Exception("User not found");
+            }
+
+            //convert db user to domain user
+            user = EfUserMapper.DbEntityToCoreModel(dbuser);
+
+            return user;
+
+        }
+
+        /// <summary>
         /// Service method to pull users from database by User Id
         /// </summary>
         /// <param name="userIds">List of User Ids</param>
@@ -121,7 +156,7 @@ namespace UserManagement.Domain.Services
         /// <param name="userName">Username</param>
         /// <param name="password">Password</param>
         /// <returns>username</returns>
-        public async Task<string> Login(string userName, string password)
+        public async Task<UserModel> Login(string userName, string password)
         {
             //validate inputs
             if(userName == null || password == null)
@@ -147,7 +182,10 @@ namespace UserManagement.Domain.Services
             //if passwords match, update user status 
             await _userRepository.UpdateUserStatus(user.Id, true);
 
-            return userName;
+            //map db user to domain user
+            var domainUser = EfUserMapper.DbEntityToCoreModel(user);
+
+            return domainUser;
         }
 
         /// <summary>

@@ -14,24 +14,29 @@ namespace UserManagement.Infrastructure.Persistence.Repositories
         /// Repository method to create new user in db
         /// </summary>
         /// <param name="newUser">Repository User Entity</param>
-        /// <returns>User Id as long</returns>
-        public async Task<string> CreateNewUser(User newUser)
+        /// <returns>User Entity</returns>
+        public async Task<User> CreateNewUser(User newUser)
         {
-
             using (var context = new DatingAppContext())
             {
+                //validate that the new user entity isn't empty
                 if(newUser == null)
                 {
                     throw new Exception("User not provided");
                 }
 
+                //update status to be true and created / updates dates 
                 newUser.Status = true;
                 newUser.CreatedDate = DateTime.Now;
                 newUser.UpdatedDate = DateTime.Now;
 
                 context.Users.Add(newUser);
                 await context.SaveChangesAsync();
-                return newUser.Username; 
+
+
+                //pull user that has just been created
+                var createdUser = await context.Users.FirstOrDefaultAsync(u => u.Username == newUser.Username);
+                return createdUser;
             }
         }
 
