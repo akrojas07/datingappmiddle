@@ -254,19 +254,19 @@ namespace UserManagement.API.Controllers
             {
                 return false;
             }
-            else if (baseRequest.FirstName == null)
+            else if (string.IsNullOrEmpty(baseRequest.FirstName))
             {
                 return false;
             }
-            else if (baseRequest.LastName == null)
+            else if (string.IsNullOrEmpty(baseRequest.LastName))
             {
                 return false;
             }
-            else if (baseRequest.Password == null)
+            else if (string.IsNullOrEmpty(baseRequest.Password))
             {
                 return false;
             }
-            else if (baseRequest.Username == null)
+            else if (string.IsNullOrWhiteSpace(baseRequest.Username))
             {
                 return false;
             }
