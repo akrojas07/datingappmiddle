@@ -55,7 +55,8 @@ namespace UserManagement.API.Controllers
                     FirstName = newUser.FirstName,
                     LastName = newUser.LastName,
                     Username = newUser.Username,
-                    Password = newUser.Password
+                    Password = newUser.Password,
+                    Photo = new DomainPhoto() { Id = newUser.PhotoId}
                 };
 
                 //pass model user into service and generate JSON Token 

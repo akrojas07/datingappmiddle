@@ -7,6 +7,6 @@ namespace UserManagement.API.Models
 {
     public class NewUserRequest : BaseUserRequest
     {
-
+        public long PhotoId { get; set; }
     }
 }

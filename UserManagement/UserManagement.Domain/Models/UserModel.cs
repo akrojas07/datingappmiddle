@@ -11,5 +11,6 @@ namespace UserManagement.Domain.Models
         public string Password { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }
+        public DomainPhoto Photo { get; set; }
     }
 }

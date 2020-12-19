@@ -18,6 +18,9 @@ using UserManagement.Infrastructure.Persistence.Interfaces;
 using UserManagement.Infrastructure.Persistence.Repositories;
 using UserManagement.Domain.Services.Interfaces;
 using UserManagement.Domain.Services;
+using UserManagement.Infrastructure.StockPhotoAPI.Interfaces;
+using UserManagement.Infrastructure.StockPhotoAPI;
+using UserManagement.Infrastructure.Http;
 
 namespace UserManagementAPI
 {
@@ -54,6 +57,8 @@ namespace UserManagementAPI
             services.AddSingleton<IUserRepository, UserRepository>();
 
             services.AddTransient<IUserService, UserService>();
+            services.AddTransient<IStockPhotoServices, StockPhotoServices>();
+            services.AddTransient<IHttpClientService, HttpClientService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

@@ -39,7 +39,7 @@ namespace UserManagement.Test.APITests
         public async Task Test_CreateNewUserController_Success()
         {
             _userService.Setup(u => u.CreateNewUser(It.IsAny<UserModel>()))
-                .ReturnsAsync("username");
+                .ReturnsAsync(new UserModel() { });
 
             var controller = new UserController(_userService.Object, _config.Object);
             var response = await controller.CreateNewUser(new NewUserRequest()
@@ -149,7 +149,7 @@ namespace UserManagement.Test.APITests
                 });
 
             var controller = new UserController(_userService.Object, _config.Object);
-            var response = await controller.GetUsersByUserId(new List<long>() { 1, 2, 3, 4 });
+            var response = await controller.GetUsersByUserId(new GetUsersByUserIdRequest() {UserIds = new List<long>{1,2,3,4} });
 
             Assert.NotNull(response);
             Assert.AreEqual(200, ((ObjectResult)response).StatusCode);
@@ -159,7 +159,7 @@ namespace UserManagement.Test.APITests
         public async Task Test_GetAllUsersByUserId_Fail_EmptyInputList()
         {
             var controller = new UserController(_userService.Object, _config.Object);
-            var response = await controller.GetUsersByUserId(new List<long>() {});
+            var response = await controller.GetUsersByUserId(new GetUsersByUserIdRequest() { UserIds = new List<long> {} });
 
             Assert.NotNull(response);
             Assert.AreEqual(400, ((ObjectResult)response).StatusCode);
@@ -169,7 +169,7 @@ namespace UserManagement.Test.APITests
         public async Task Test_GetUsersByUserId_Fail_NoDbUsers()
         {
             var controller = new UserController(_userService.Object, _config.Object);
-            var response = await controller.GetUsersByUserId(new List<long>() { 1, 2, 3, 4 });
+            var response = await controller.GetUsersByUserId(new GetUsersByUserIdRequest() { UserIds = new List<long> { 100, 200, 300, 400 } });
 
             Assert.NotNull(response);
             Assert.AreEqual(500, ((ObjectResult)response).StatusCode);
@@ -179,7 +179,7 @@ namespace UserManagement.Test.APITests
         public async Task Test_Login_Success()
         {
             _userService.Setup(u => u.Login(It.IsAny<string>(), It.IsAny<string>()))
-                .ReturnsAsync("username");
+                .ReturnsAsync(new UserModel() { Username="username"});
 
             var controller = new UserController(_userService.Object, _config.Object);
             var response = await controller.Login(new LoginUserRequest() { Username = "username", Password = "password"});
@@ -219,7 +219,7 @@ namespace UserManagement.Test.APITests
                 .Returns(Task.CompletedTask);
 
             var controller = new UserController(_userService.Object, _config.Object);
-            var response = await controller.Logout("username");
+            var response = await controller.Logout(new LogoutRequest() { Username="username"});
 
             Assert.NotNull(response);
             Assert.AreEqual(200, ((OkResult)response).StatusCode);
@@ -229,7 +229,7 @@ namespace UserManagement.Test.APITests
         public async Task Test_Logout_Fail_NullUsername()
         {
             var controller = new UserController(_userService.Object, _config.Object);
-            var response = await controller.Logout(null);
+            var response = await controller.Logout(new LogoutRequest());
 
             Assert.NotNull(response);
             Assert.AreEqual(400, ((ObjectResult)response).StatusCode);
@@ -242,7 +242,7 @@ namespace UserManagement.Test.APITests
                 .ThrowsAsync(new Exception("Internal Exception"));
 
             var controller = new UserController(_userService.Object, _config.Object);
-            var response = await controller.Logout("username");
+            var response = await controller.Logout(new LogoutRequest() { Username = "username" });
 
             Assert.NotNull(response);
             Assert.AreEqual(500, ((ObjectResult)response).StatusCode);

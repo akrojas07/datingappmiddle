@@ -15,5 +15,6 @@ namespace UserManagement.Infrastructure.Persistence.Entities
         public bool? Status { get; set; }
         public DateTime? CreatedDate { get; set; }
         public DateTime? UpdatedDate { get; set; }
+        public long? PhotoId { get; set; }
     }
 }

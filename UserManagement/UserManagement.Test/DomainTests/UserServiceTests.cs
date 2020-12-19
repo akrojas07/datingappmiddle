@@ -10,6 +10,7 @@ using UserManagement.Domain.Services;
 
 using UserManagement.Infrastructure.Persistence.Interfaces;
 using UserManagement.Infrastructure.Persistence.Entities;
+using UserManagement.Infrastructure.StockPhotoAPI.Interfaces;
 
 namespace UserManagement.Test.DomainTests
 {
@@ -17,10 +18,13 @@ namespace UserManagement.Test.DomainTests
     public class UserServiceTests
     {
         private Mock<IUserRepository> _userRepository;
+        private Mock<IStockPhotoServices> _stockPhotos;
+
         [SetUp]
         public void Setup()
         {
             _userRepository = new Mock<IUserRepository>();
+            _stockPhotos = new Mock<IStockPhotoServices>();
         }
 
         [Test]
@@ -28,9 +32,9 @@ namespace UserManagement.Test.DomainTests
         {
             _userRepository.Setup(u => u.GetUserByUserName(It.IsAny<string>()));
             _userRepository.Setup(u => u.CreateNewUser(It.IsAny<User>()))
-                .ReturnsAsync("username");
+                .ReturnsAsync(new User() { });
 
-            var userService = new UserService(_userRepository.Object);
+            var userService = new UserService(_userRepository.Object, _stockPhotos.Object);
             await userService.CreateNewUser(new UserModel()
             {
                 FirstName = "Bonnie",
@@ -57,7 +61,7 @@ namespace UserManagement.Test.DomainTests
                 });
 
 
-            var userService = new UserService(_userRepository.Object);
+            var userService = new UserService(_userRepository.Object, _stockPhotos.Object);
             Assert.ThrowsAsync<Exception>(() => userService.CreateNewUser(new UserModel()
             {
                 FirstName = "Bonnie",
@@ -75,7 +79,7 @@ namespace UserManagement.Test.DomainTests
         {
             _userRepository.Setup(u => u.GetUserByUserName(It.IsAny<string>()));
 
-            var userService = new UserService(_userRepository.Object);
+            var userService = new UserService(_userRepository.Object, _stockPhotos.Object);
             Assert.ThrowsAsync<Exception>(() => userService.CreateNewUser(new UserModel()
             {
                 FirstName = "Clyde",
@@ -91,7 +95,7 @@ namespace UserManagement.Test.DomainTests
         {
             _userRepository.Setup(u => u.GetUserByUserName(It.IsAny<string>()));
 
-            var userService = new UserService(_userRepository.Object);
+            var userService = new UserService(_userRepository.Object, _stockPhotos.Object);
             Assert.ThrowsAsync<Exception>(() => userService.CreateNewUser(null));
 
             _userRepository.Verify(u => u.CreateNewUser(It.IsAny<User>()), Times.Never);
@@ -112,7 +116,7 @@ namespace UserManagement.Test.DomainTests
             _userRepository.Setup(u => u.DeleteUserAccount(It.IsAny<long>()))
                 .Returns(Task.CompletedTask);
 
-            var userService = new UserService(_userRepository.Object);
+            var userService = new UserService(_userRepository.Object, _stockPhotos.Object);
             await userService.DeleteUserAccount("Forever");
 
             _userRepository.Verify(u => u.DeleteUserAccount(It.IsAny<long>()), Times.Once);
@@ -123,7 +127,7 @@ namespace UserManagement.Test.DomainTests
         [Test]
         public void Test_DeleteUserAccount_Fail_NullInput()
         {
-            var userService = new UserService(_userRepository.Object);
+            var userService = new UserService(_userRepository.Object, _stockPhotos.Object);
             Assert.ThrowsAsync<Exception>(() => userService.DeleteUserAccount(null));
 
             _userRepository.Verify(u => u.DeleteUserAccount(It.IsAny<long>()), Times.Never);
@@ -134,7 +138,7 @@ namespace UserManagement.Test.DomainTests
         {
             _userRepository.Setup(u => u.GetUserByUserName(It.IsAny<string>()));
 
-            var userService = new UserService(_userRepository.Object);
+            var userService = new UserService(_userRepository.Object, _stockPhotos.Object);
             Assert.ThrowsAsync<Exception>(() => userService.DeleteUserAccount("Chonker"));
 
             _userRepository.Verify(u => u.DeleteUserAccount(It.IsAny<long>()), Times.Never);
@@ -149,7 +153,7 @@ namespace UserManagement.Test.DomainTests
                     {new User(){ FirstName = "Boonie", LastName="Cl"} }
                 });
 
-            var userService = new UserService(_userRepository.Object);
+            var userService = new UserService(_userRepository.Object, _stockPhotos.Object);
             await userService.GetUsersByUserId(new List<long>() { 1 });
 
             _userRepository.Verify(u => u.GetUsersByUserId(It.IsAny<List<long>>()), Times.Once);
@@ -159,7 +163,7 @@ namespace UserManagement.Test.DomainTests
         public void Test_GetUsersByUserId_Fail_NoUsers()
         {
             _userRepository.Setup(u => u.GetUsersByUserId(It.IsAny<List<long>>()));
-            var userService = new UserService(_userRepository.Object);
+            var userService = new UserService(_userRepository.Object, _stockPhotos.Object);
             Assert.ThrowsAsync<Exception>(() => userService.GetUsersByUserId(new List<long>() { 0 }));
 
             _userRepository.Verify(u => u.GetUsersByUserId(It.IsAny<List<long>>()), Times.Once);
@@ -180,7 +184,7 @@ namespace UserManagement.Test.DomainTests
             _userRepository.Setup(u => u.UpdateUserStatus(It.IsAny<long>(), It.IsAny<bool>()))
                 .Returns(Task.CompletedTask);
 
-            var userService = new UserService(_userRepository.Object);
+            var userService = new UserService(_userRepository.Object, _stockPhotos.Object);
             await userService.Login("Forever", "BoonieandClyde");
 
             _userRepository.Verify(u => u.UpdateUserStatus(It.IsAny<long>(), It.IsAny<bool>()), Times.Once);
@@ -202,7 +206,7 @@ namespace UserManagement.Test.DomainTests
             _userRepository.Setup(u => u.UpdateUserStatus(It.IsAny<long>(), It.IsAny<bool>()))
                 .Returns(Task.CompletedTask);
 
-            var userService = new UserService(_userRepository.Object);
+            var userService = new UserService(_userRepository.Object, _stockPhotos.Object);
             Assert.ThrowsAsync<Exception>(() => userService.Login("Forever", "boonieandClyde"));
 
             _userRepository.Verify(u => u.UpdateUserStatus(It.IsAny<long>(), It.IsAny<bool>()), Times.Never);
@@ -211,7 +215,7 @@ namespace UserManagement.Test.DomainTests
         [Test]
         public void Test_Login_Fail_NullInput()
         {
-            var userService = new UserService(_userRepository.Object);
+            var userService = new UserService(_userRepository.Object, _stockPhotos.Object);
             Assert.ThrowsAsync<Exception>(() => userService.Login("Forever", null));
 
             _userRepository.Verify(u => u.UpdateUserStatus(It.IsAny<long>(), It.IsAny<bool>()), Times.Never);
@@ -220,7 +224,7 @@ namespace UserManagement.Test.DomainTests
         [Test]
         public void Test_Login_Fail_NoUserFound()
         {
-            var userService = new UserService(_userRepository.Object);
+            var userService = new UserService(_userRepository.Object, _stockPhotos.Object);
             Assert.ThrowsAsync<Exception>(() => userService.Login("Forever", "BoonieandClyde"));
 
             _userRepository.Verify(u => u.UpdateUserStatus(It.IsAny<long>(), It.IsAny<bool>()), Times.Never);
@@ -241,7 +245,7 @@ namespace UserManagement.Test.DomainTests
             _userRepository.Setup(u => u.UpdateUserStatus(It.IsAny<long>(), It.IsAny<bool>()))
                 .Returns(Task.CompletedTask);
 
-            var userService = new UserService(_userRepository.Object);
+            var userService = new UserService(_userRepository.Object, _stockPhotos.Object);
             await userService.Logout("Forever");
 
             _userRepository.Verify(u => u.UpdateUserStatus(It.IsAny<long>(), It.IsAny<bool>()), Times.Once);
@@ -254,7 +258,7 @@ namespace UserManagement.Test.DomainTests
             _userRepository.Setup(u => u.UpdateUserStatus(It.IsAny<long>(), It.IsAny<bool>()))
                 .Returns(Task.CompletedTask);
 
-            var userService = new UserService(_userRepository.Object);
+            var userService = new UserService(_userRepository.Object, _stockPhotos.Object);
             Assert.ThrowsAsync<Exception>(() => userService.Logout("orever"));
 
             _userRepository.Verify(u => u.UpdateUserStatus(It.IsAny<long>(), It.IsAny<bool>()), Times.Never);
@@ -263,7 +267,7 @@ namespace UserManagement.Test.DomainTests
         [Test]
         public void Test_Logout_Fail_NullInput()
         {
-            var userService = new UserService(_userRepository.Object);
+            var userService = new UserService(_userRepository.Object, _stockPhotos.Object);
             Assert.ThrowsAsync<Exception>(() => userService.Logout(null));
 
             _userRepository.Verify(u => u.UpdateUserStatus(It.IsAny<long>(), It.IsAny<bool>()), Times.Never);
@@ -272,7 +276,7 @@ namespace UserManagement.Test.DomainTests
         [Test]
         public void Test_Logout_Fail_NoUserFound()
         {
-            var userService = new UserService(_userRepository.Object);
+            var userService = new UserService(_userRepository.Object, _stockPhotos.Object);
             Assert.ThrowsAsync<Exception>(() => userService.Logout("Forever"));
 
             _userRepository.Verify(u => u.UpdateUserStatus(It.IsAny<long>(), It.IsAny<bool>()), Times.Never);
@@ -293,7 +297,7 @@ namespace UserManagement.Test.DomainTests
             _userRepository.Setup(u => u.UpdateUserProfile(It.IsAny<User>()))
                 .Returns(Task.CompletedTask);
 
-            var service = new UserService(_userRepository.Object);
+            var service = new UserService(_userRepository.Object, _stockPhotos.Object);
             await service.UpdateUserProfile(new UserModel() 
             {
                 FirstName = "Bonkers",
@@ -320,7 +324,7 @@ namespace UserManagement.Test.DomainTests
             _userRepository.Setup(u => u.UpdateUserProfile(It.IsAny<User>()))
                 .Returns(Task.CompletedTask);
 
-            var service = new UserService(_userRepository.Object);
+            var service = new UserService(_userRepository.Object, _stockPhotos.Object);
             Assert.ThrowsAsync<Exception>(() => service.UpdateUserProfile(new UserModel()
             {
                 FirstName = "Bonkers",
@@ -335,7 +339,7 @@ namespace UserManagement.Test.DomainTests
         {
             _userRepository.Setup(u => u.GetUserByUserName(It.IsAny<string>()));
 
-            var service = new UserService(_userRepository.Object);
+            var service = new UserService(_userRepository.Object, _stockPhotos.Object);
             Assert.ThrowsAsync<Exception>(() => service.UpdateUserProfile(new UserModel()
             {
                 FirstName = "Bonkers",

@@ -31,6 +31,7 @@ namespace UserManagement.Infrastructure.Persistence.Repositories
                 newUser.UpdatedDate = DateTime.Now;
 
                 context.Users.Add(newUser);
+
                 await context.SaveChangesAsync();
 
 
@@ -67,7 +68,8 @@ namespace UserManagement.Infrastructure.Persistence.Repositories
         {
             using (var context = new DatingAppContext())
             {
-                return await context.Users.Where(u => userIds.Any(id => u.Id == id)).ToListAsync();
+                return await context.Users
+                    .Where(u => userIds.Any(id => u.Id == id)).ToListAsync();
             }
         }
 
@@ -80,7 +82,8 @@ namespace UserManagement.Infrastructure.Persistence.Repositories
             using(var context = new DatingAppContext())
             {
                 User existingUser = new User();
-                existingUser = await context.Users.FirstOrDefaultAsync(u => u.Username == userName);
+                existingUser = await context.Users
+                    .FirstOrDefaultAsync(u => u.Username == userName);
 
                 return existingUser;
             }
