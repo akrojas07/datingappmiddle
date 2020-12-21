@@ -63,7 +63,7 @@ namespace UserManagement.API.Controllers
                 var user = await _userService.CreateNewUser(modelUser);
                 var tokenstring = GenerateJsonWebToken();
 
-                return StatusCode(201, new { un = user.Username, fn = user.FirstName, ln = user.LastName, token = tokenstring, url = user.Photo.URL });
+                return StatusCode(201, new { un = user.Username, fn = user.FirstName, ln = user.LastName, token = tokenstring, url = user.Photo?.URL });
             }
             catch (Exception e)
             {
@@ -165,7 +165,7 @@ namespace UserManagement.API.Controllers
                 var tokenstring = GenerateJsonWebToken();
 
                 //return username and token
-                return StatusCode(200, new { un = user.Username, fn = user.FirstName, ln = user.LastName, token = tokenstring, url= user.Photo.URL });
+                return StatusCode(200, new { un = user.Username, fn = user.FirstName, ln = user.LastName, token = tokenstring, url= user.Photo?.URL });
             }
             catch(Exception e)
             {

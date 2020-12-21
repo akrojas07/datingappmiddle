@@ -270,6 +270,8 @@ namespace UserManagement.Domain.Services
                     throw new Exception("Invalid User");
                 }
 
+                updatedUser.Photo = new DomainPhoto(); 
+
                 //map updatedUser to user
                 user = EfUserMapper.CoreModelToDbEntity(updatedUser);
 
