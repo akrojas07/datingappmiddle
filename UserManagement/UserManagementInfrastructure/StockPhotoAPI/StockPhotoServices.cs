@@ -29,7 +29,7 @@ namespace UserManagement.Infrastructure.StockPhotoAPI
 
         public async Task<Photo> GetPhotoById(long id)
         {
-            return await _httpClientService.GetAsync<Photo>($"{_baseUrl}/photo/{id}", _key, "Unable to find photo object");     
+            return await _httpClientService.GetAsync<Photo>($"{_baseUrl}/photos/{id}", _key, "Unable to find photo object");     
         }
 
         public async Task<PhotoGallery> GetPhotos(int page = 1, int perPageCount = 10)

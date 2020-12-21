@@ -18,6 +18,7 @@ namespace UserManagement.Domain.Mapper
                 Username = dbEntity.Username,
                 Password = dbEntity.Password,
                 
+                
             };
 
             return coreModel;
