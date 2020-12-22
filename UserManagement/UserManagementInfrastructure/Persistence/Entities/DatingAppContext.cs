@@ -17,6 +17,7 @@ namespace UserManagement.Infrastructure.Persistence.Entities
         {
         }
 
+        public virtual DbSet<Match> Matches { get; set; }
         public virtual DbSet<User> Users { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
@@ -30,15 +31,42 @@ namespace UserManagement.Infrastructure.Persistence.Entities
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<Match>(entity =>
+            {
+                entity.HasOne(d => d.FirstUser)
+                    .WithMany(p => p.MatchFirstUsers)
+                    .HasForeignKey(d => d.FirstUserId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK__Matches__FirstUs__4BAC3F29");
+
+                entity.HasOne(d => d.SecondUser)
+                    .WithMany(p => p.MatchSecondUsers)
+                    .HasForeignKey(d => d.SecondUserId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK__Matches__SecondU__4CA06362");
+            });
+
             modelBuilder.Entity<User>(entity =>
             {
+                entity.Property(e => e.About)
+                    .HasMaxLength(255)
+                    .IsUnicode(false);
+
                 entity.Property(e => e.CreatedDate).HasColumnType("datetime");
 
                 entity.Property(e => e.FirstName)
                     .HasMaxLength(255)
                     .IsUnicode(false);
 
+                entity.Property(e => e.Interests)
+                    .HasMaxLength(255)
+                    .IsUnicode(false);
+
                 entity.Property(e => e.LastName)
+                    .HasMaxLength(255)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.Location)
                     .HasMaxLength(255)
                     .IsUnicode(false);
 

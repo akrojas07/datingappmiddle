@@ -56,6 +56,8 @@ namespace UserManagement.API.Controllers
                     LastName = newUser.LastName,
                     Username = newUser.Username,
                     Password = newUser.Password,
+                    Location = newUser.Location,
+                    Gender = newUser.Gender,
                     Photo = new DomainPhoto() { Id = newUser.PhotoId}
                 };
 
@@ -99,6 +101,32 @@ namespace UserManagement.API.Controllers
                 return StatusCode(500, e.Message);
             }
 
+        }
+
+        /// <summary>
+        /// Controller method to pull single user by username
+        /// </summary>
+        /// <param name="username">String username</param>
+        /// <returns>User Model user</returns>
+
+        [HttpGet]
+        [Route("{username}")]
+        public async Task<IActionResult> GetUserByUsername(string username)
+        {
+            if(username == null)
+            {
+                return StatusCode(400, "Users not provided");
+            }
+
+            try
+            {
+                var user = await _userService.GetUserByUsername(username);
+                return StatusCode(200, user);
+            }
+            catch(Exception e)
+            {
+                return StatusCode(500, e.Message);
+            }
         }
 
         /// <summary>
@@ -229,9 +257,17 @@ namespace UserManagement.API.Controllers
                     Username = updateUser.Username,
                     FirstName = updateUser.FirstName,
                     LastName = updateUser.LastName,
-                    Password = updateUser.Password
+                    Location = updateUser.Location,
+                    About = updateUser.About,
+                    Interests = updateUser.Interests,
+                    Gender = updateUser.Gender
                 };
 
+                //if user doesn't update password, then don't change password
+                if (!string.IsNullOrEmpty(updateUser.Password))
+                {
+                    domainModel.Password = updateUser.Password;
+                }
                 //call update profile service method
                 await _userService.UpdateUserProfile(domainModel);
 
@@ -268,6 +304,10 @@ namespace UserManagement.API.Controllers
                 return false;
             }
             else if (string.IsNullOrWhiteSpace(baseRequest.Username))
+            {
+                return false;
+            }
+            else if (string.IsNullOrEmpty(baseRequest.Location))
             {
                 return false;
             }

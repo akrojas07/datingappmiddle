@@ -315,6 +315,10 @@ namespace UserManagement.Domain.Services
             {
                 result = false;
             }
+            else if(coreUser.Location == null)
+            {
+                result = false;
+            }
             else
             {
                 result = true;

@@ -125,6 +125,10 @@ namespace UserManagement.Infrastructure.Persistence.Repositories
                 userProfile.FirstName = updatedUser.FirstName;
                 userProfile.LastName = updatedUser.LastName;
                 userProfile.Password = updatedUser.Password;
+                userProfile.Location = updatedUser.Location;
+                userProfile.Gender = updatedUser.Gender;
+                userProfile.About = updatedUser.About;
+                userProfile.Interests = updatedUser.Interests;
                 userProfile.UpdatedDate = DateTime.Now;
 
                 await context.SaveChangesAsync();

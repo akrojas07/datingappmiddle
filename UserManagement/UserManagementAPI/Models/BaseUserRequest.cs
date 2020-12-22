@@ -13,5 +13,13 @@ namespace UserManagement.API.Models
 
         [Required(AllowEmptyStrings = false, ErrorMessage = "Last Name is required")]
         public string LastName { get; set; }
+
+        [Required(AllowEmptyStrings =false, ErrorMessage = "Location is required")]
+        public string Location { get; set; }
+
+        [Required(ErrorMessage ="Gender is required")]
+        public bool Gender { get; set; }
+        public string Interests { get; set; }
+        public string About { get; set; }
     }
 }

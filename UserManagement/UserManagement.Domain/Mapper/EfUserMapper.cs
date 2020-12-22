@@ -17,9 +17,11 @@ namespace UserManagement.Domain.Mapper
                 LastName = dbEntity.LastName,
                 Username = dbEntity.Username,
                 Password = dbEntity.Password,
-                
-                
-            };
+                Location = dbEntity.Location,
+                Interests = dbEntity.Interests,
+                Gender = (bool)dbEntity.Gender,
+                About = dbEntity.About
+    };
 
             return coreModel;
         }
@@ -33,7 +35,11 @@ namespace UserManagement.Domain.Mapper
                 Username = coreModel.Username,
                 Password = coreModel.Password,
                 Id = coreModel.Id,
-                PhotoId = coreModel.Photo.Id
+                PhotoId = coreModel.Photo.Id,
+                Location = coreModel.Location,
+                About = coreModel.About,
+                Interests = coreModel.Interests,
+                Gender = coreModel.Gender
             };
 
             return dbEntity;
