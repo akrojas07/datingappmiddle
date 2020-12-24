@@ -9,6 +9,7 @@ namespace UserManagement.Infrastructure.Persistence.Interfaces
     public interface IUserRepository
     {
         Task<User> CreateNewUser(User newUser);
+        Task<List<User>> GetUsersByLocation(string location);
         Task<List<User>> GetUsersByUserId(List<long> userIds);
         Task<User> GetUserByUserName(string userName);
         Task UpdateUserProfile(User updatedUser);

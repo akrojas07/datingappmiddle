@@ -9,6 +9,7 @@ namespace UserManagement.Domain.Services.Interfaces
     public interface IUserService
     {
         Task<UserModel> CreateNewUser(UserModel newUser);
+        Task<List<UserModel>> GetUsersByLocation(string location);
         Task<UserModel> GetUserByUsername(string username);
         Task<List<UserModel>> GetUsersByUserId(List<long> userIds);
         Task UpdateUserProfile(UserModel updatedUser);

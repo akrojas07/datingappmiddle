@@ -60,6 +60,20 @@ namespace UserManagement.Infrastructure.Persistence.Repositories
         }
 
         /// <summary>
+        /// Repository method to pull users by location
+        /// </summary>
+        /// <param name="location">Location as string</param>
+        /// <returns>List of User Entities</returns>
+        public async Task<List<User>> GetUsersByLocation(string location)
+        {
+            using(var context = new DatingAppContext())
+            {
+                return await context.Users.Where(u => u.Location == location)
+                    .ToListAsync();
+            }
+        }
+
+        /// <summary>
         /// Repository method to pull list of users from database by userId
         /// </summary>
         /// <param name="userIds">List of User Ids</param>

@@ -138,6 +138,38 @@ namespace UserManagement.Domain.Services
         }
 
         /// <summary>
+        /// Service method to pull users by location
+        /// </summary>
+        /// <param name="location">Location as string</param>
+        /// <returns>List of Domain User Models</returns>
+        public async Task<List<UserModel>> GetUsersByLocation(string location)
+        {
+            //validate location input 
+            if(string.IsNullOrEmpty(location))
+            {
+                throw new ArgumentException("Location not provided");
+            }
+            //create empty list of domain users 
+            List<UserModel> usersByLocation = new List<UserModel>();
+
+            var dbUsersList = await _userRepository.GetUsersByLocation(location);
+
+            //validate db users list is not empty
+            if(dbUsersList == null || dbUsersList.Count < 0)
+            {
+                throw new Exception("Users not found");
+            }
+
+            //map db users to domain list
+            foreach(var dbUser in dbUsersList)
+            {
+                usersByLocation.Add(EfUserMapper.DbEntityToCoreModel(dbUser));
+            }
+
+            return usersByLocation;
+        }
+
+        /// <summary>
         /// Service method to pull users from database by User Id
         /// </summary>
         /// <param name="userIds">List of User Ids</param>

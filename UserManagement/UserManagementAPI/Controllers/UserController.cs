@@ -104,6 +104,32 @@ namespace UserManagement.API.Controllers
         }
 
         /// <summary>
+        /// Controller method to pull all users by location
+        /// </summary>
+        /// <param name="location">Location as string</param>
+        /// <returns>User Model users</returns>
+        [HttpGet]
+        [Route("{location}")]
+        public async Task<IActionResult> GetUsersByLocation(string location)
+        {
+            if(location == null)
+            {
+                return StatusCode(400, "Location not provided");
+            }
+
+            try
+            {
+                var users = await _userService.GetUsersByLocation(location);
+                return StatusCode(200, users);
+            }
+            catch(Exception e)
+            {
+                return StatusCode(500, e.Message);
+            }
+
+        }
+
+        /// <summary>
         /// Controller method to pull single user by username
         /// </summary>
         /// <param name="username">String username</param>
