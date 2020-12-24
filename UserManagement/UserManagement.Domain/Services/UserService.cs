@@ -53,7 +53,7 @@ namespace UserManagement.Domain.Services
                     var newDomainUser = EfUserMapper.DbEntityToCoreModel(createdUser);
 
                     //map photo id to photo for domain user
-                    if(createdUser.PhotoId != null)
+                    if(createdUser.PhotoId != null && createdUser.PhotoId > 0)
                     {
                         var photo = await _stockPhoto.GetPhotoById((long)createdUser.PhotoId);
                         newDomainUser.Photo = new DomainPhoto() { Id = photo.Id, URL = photo.Source.Medium};
@@ -127,7 +127,7 @@ namespace UserManagement.Domain.Services
             //convert db user to domain user
             user = EfUserMapper.DbEntityToCoreModel(dbuser);
 
-            if (dbuser.PhotoId != null)
+            if (dbuser.PhotoId != null && dbuser.PhotoId > 0)
             {
                 var photo = await _stockPhoto.GetPhotoById((long)dbuser.PhotoId);
                 user.Photo = new DomainPhoto() { Id = photo.Id, URL = photo.Source.Medium };

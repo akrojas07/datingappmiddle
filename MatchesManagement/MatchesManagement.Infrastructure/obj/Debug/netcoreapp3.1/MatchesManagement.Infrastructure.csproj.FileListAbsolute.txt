@@ -1,0 +1,5 @@
+C:\Users\Anakaren\Documents\CS_Projects\Personal Website\DatingApp\datingappmiddle\MatchesManagement\MatchesManagement.Infrastructure\bin\Debug\netcoreapp3.1\MatchesManagement.Infrastructure.deps.json
+C:\Users\Anakaren\Documents\CS_Projects\Personal Website\DatingApp\datingappmiddle\MatchesManagement\MatchesManagement.Infrastructure\bin\Debug\netcoreapp3.1\MatchesManagement.Infrastructure.dll
+C:\Users\Anakaren\Documents\CS_Projects\Personal Website\DatingApp\datingappmiddle\MatchesManagement\MatchesManagement.Infrastructure\obj\Debug\netcoreapp3.1\MatchesManagement.Infrastructure.csprojAssemblyReference.cache
+C:\Users\Anakaren\Documents\CS_Projects\Personal Website\DatingApp\datingappmiddle\MatchesManagement\MatchesManagement.Infrastructure\obj\Debug\netcoreapp3.1\MatchesManagement.Infrastructure.AssemblyInfoInputs.cache
+C:\Users\Anakaren\Documents\CS_Projects\Personal Website\DatingApp\datingappmiddle\MatchesManagement\MatchesManagement.Infrastructure\obj\Debug\netcoreapp3.1\MatchesManagement.Infrastructure.AssemblyInfo.cs
