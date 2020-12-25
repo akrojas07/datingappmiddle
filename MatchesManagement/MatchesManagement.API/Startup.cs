@@ -12,6 +12,8 @@ using System.Text;
 using MatchesManagement.Infrastructure.HTTPClient;
 using MatchesManagement.Infrastructure.UserManagementAPI.Interfaces;
 using MatchesManagement.Infrastructure.UserManagementAPI.Services;
+using MatchesManagement.Domain.Interfaces;
+using MatchesManagement.Domain.Services;
 
 namespace MatchesManagement.API
 {
@@ -46,12 +48,12 @@ namespace MatchesManagement.API
 
             services.AddControllers();
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_3_0);
-            services.AddMvc();
             services.AddCors();
 
             services.AddSingleton<IMatchesRepository, MatchesRepository>();
 
             services.AddTransient<IHttpClientService, HttpClientService>();
+            services.AddTransient<IMatchesServices, MatchesServices>();
             services.AddTransient<IUserServices, UserServices>();
         }
 

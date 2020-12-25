@@ -163,7 +163,15 @@ namespace UserManagement.Domain.Services
             //map db users to domain list
             foreach(var dbUser in dbUsersList)
             {
-                usersByLocation.Add(EfUserMapper.DbEntityToCoreModel(dbUser));
+                var user = EfUserMapper.DbEntityToCoreModel(dbUser);
+
+                if (dbUser.PhotoId != null && dbUser.PhotoId > 0)
+                {
+                    var picture = await _stockPhoto.GetPhotoById((long)dbUser.PhotoId);
+                    user.Photo = new DomainPhoto() { Id = picture.Id, URL = picture.Source.Medium };
+                }
+
+                usersByLocation.Add(user);
             }
 
             return usersByLocation;

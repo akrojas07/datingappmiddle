@@ -7,7 +7,7 @@ namespace MatchesManagement.Infrastructure.HTTPClient
 {
     public interface IHttpClientService
     {
-        Task<T> GetAsync<T>(string url, string key, string errorMessage = "");
-        Task<T> PutAsync<T>(string url, string key, string data, string errorMessage = "");
+        Task<T> GetAsync<T>(string url, string key, string scheme = "", string errorMessage = "");
+        Task<T> PutAsync<T>(string url, string key, string data, string scheme = "", string errorMessage = "");
     }
 }

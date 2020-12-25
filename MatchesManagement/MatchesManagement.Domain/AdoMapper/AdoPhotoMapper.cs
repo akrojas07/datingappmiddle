@@ -11,10 +11,12 @@ namespace MatchesManagement.Domain.AdoMapper
     {
         public static MicroServicePhoto DomainToMSPhoto(DomainPhoto domainPhoto)
         {
-            var msPhoto = new MicroServicePhoto()
+            var msPhoto = new MicroServicePhoto();
+
+            if(domainPhoto != null)
             {
-                URL = domainPhoto.URL,
-                Id = domainPhoto.Id
+                msPhoto.URL = domainPhoto.URL;
+                msPhoto.Id = domainPhoto.Id;
             };
 
             return msPhoto;
@@ -22,12 +24,13 @@ namespace MatchesManagement.Domain.AdoMapper
 
         public static DomainPhoto MSToDomainPhoto(MicroServicePhoto msPhoto)
         {
-            var domainPhoto = new DomainPhoto()
+            var domainPhoto = new DomainPhoto();
+            if (msPhoto != null)
             {
-                Id = msPhoto.Id,
-                URL = msPhoto.URL
-            };
-
+                domainPhoto.Id = msPhoto.Id;
+                domainPhoto.URL = msPhoto.URL;
+            }
+            
             return domainPhoto;
         }
     }

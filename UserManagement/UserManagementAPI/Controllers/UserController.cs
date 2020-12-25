@@ -109,7 +109,7 @@ namespace UserManagement.API.Controllers
         /// <param name="location">Location as string</param>
         /// <returns>User Model users</returns>
         [HttpGet]
-        [Route("{location}")]
+        [Route("location/{location}")]
         public async Task<IActionResult> GetUsersByLocation(string location)
         {
             if(location == null)
@@ -136,7 +136,7 @@ namespace UserManagement.API.Controllers
         /// <returns>User Model user</returns>
 
         [HttpGet]
-        [Route("{username}")]
+        [Route("username/{username}")]
         public async Task<IActionResult> GetUserByUsername(string username)
         {
             if(username == null)

@@ -26,7 +26,7 @@ namespace MatchesManagement.Domain.Services
         /// </summary>
         /// <param name="matchId">Long</param>
         /// <returns>Domain match model</returns>
-        public async Task<Match> GetMatchByMatchId(long matchId)
+        public async Task<Match> GetMatchByMatchId(long matchId, string token)
         {
             //validate input
             if(matchId <0)
@@ -51,7 +51,13 @@ namespace MatchesManagement.Domain.Services
 
         }
 
-        public async Task<List<Match>> GetMatchesByUserId(long userId)
+        /// <summary>
+        /// Service method to pull matches by user id
+        /// </summary>
+        /// <param name="userId">User ID as long</param>
+        /// <returns>List of domain matches</returns>
+
+        public async Task<List<Match>> GetMatchesByUserId(long userId, string token)
         {
             //validate input
             if(userId < 0)
@@ -79,6 +85,13 @@ namespace MatchesManagement.Domain.Services
             return domainMatches; 
         }
 
+        /// <summary>
+        /// Service method to pull new potential matches
+        /// </summary>
+        /// <param name="location">Location as string</param>
+        /// <param name="token">Token as string</param>
+        /// <param name="userId">User ID as long</param>
+        /// <returns>List of Domain Users</returns>
         public async Task<List<User>> GetNewPotentialMatches(string location, string token, long userId)
         {
             //validate input
@@ -108,24 +121,105 @@ namespace MatchesManagement.Domain.Services
 
             return users;
         }
-        
-        public async Task UpsertMatches(List<Match> matches)
+
+
+        /// <summary>
+        /// Service Method to upsert matches
+        /// </summary>
+        /// <param name="matches">Domain matches as list</param>
+        /// <returns>Task Complete</returns>
+        public async Task UpsertMatches(List<Match> matches, string token)
         {
-            //validate matches list
+            //validate matches list is not null or empty
             if(matches == null || matches.Count < 0)
             {
                 throw new ArgumentException();
             }
 
+            //create new list of db matches
             var dbMatches = new List<Matches>();
+
+            //validate matches
+            var validatedMatches = await UpsertValidation(matches, token);
+
             //map domain matches to db matches
-            foreach(var match in matches)
+            foreach(var match in validatedMatches)
             {
                 dbMatches.Add(AdoMatchesMapper.CoreModelToDbEntity(match));
             }
 
             //call method
             await _matchesRepository.UpsertMatches(dbMatches);
+        }
+
+        /// <summary>
+        /// Service method to validate matches before upserting
+        /// </summary>
+        /// <param name="matches">List of Domain matches</param>
+        /// <param name="token">Token as string</param>
+        /// <returns>List of Domain matches</returns>
+        private async Task<List<Match>> UpsertValidation(List<Match> matches, string token)
+        {
+            //validate matches list
+            if (matches == null || matches.Count < 0)
+            {
+                throw new ArgumentException();
+            }
+
+            //loop through the matches 
+            foreach(var match in matches)
+            {
+                //validate match exists in db
+                if(match.Id > 0 )
+                {
+                    //set value of user ids to validate
+                    var userIds = new List<long>();
+                    userIds.Add(match.SecondUserId);
+                    userIds.Add(match.FirstUserId);
+
+                    //pull user from db
+                    var users = await _userServices.GetUsersByUserId(userIds, token);
+
+                    //if users list is less than 2 or null
+                    if(users.Count < 2 || users == null)
+                    {
+                        matches.Remove(match);
+
+                        //move on to next match
+                        continue;
+                    }
+
+                    //pull match from db
+                    var dbMatch = await _matchesRepository.GetMatchByMatchId(match.Id);
+
+                    //validate match exists and matched field isn't set to false
+                    if(dbMatch == null || dbMatch.Matched == false)
+                    {
+                        //if match doesn't exist
+                        matches.Remove(match);
+
+                        //move onto next match
+                        continue;
+                    }
+
+                    //if db match exists, compare to value of domain match
+                    //if they match, set "matched" equal to value of liked
+                    //if they don't match, set to opposite value 
+                    match.Matched = (match.Liked == dbMatch.Liked) ? match.Liked : !match.Liked;
+                }
+
+                //if match doesnt exist in db, and liked field is false, set match to false
+                else
+                {
+                    if(match.Liked == false)
+                    {
+                        match.Matched = false;
+                    }
+                }
+            }
+
+            return matches;
+
         }
     }
 }

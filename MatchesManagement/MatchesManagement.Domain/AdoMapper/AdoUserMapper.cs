@@ -4,6 +4,7 @@ using System.Text;
 
 using MicroServiceUser = MatchesManagement.Infrastructure.UserManagementAPI.Models.User;
 using DomainUser = MatchesManagement.Domain.Models.User;
+using MatchesManagement.Domain.Models;
 
 namespace MatchesManagement.Domain.AdoMapper
 {

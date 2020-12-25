@@ -23,13 +23,13 @@ namespace MatchesManagement.Infrastructure.UserManagementAPI.Services
 
         public async Task<List<User>> GetUsersByLocation(string location, string token)
         {
-            return await _httpService.GetAsync<List<User>>($"{_baseUrl} + user/{location}", token);
+            return await _httpService.GetAsync<List<User>>($"{_baseUrl}/user/location/{location}", token, "Bearer");
         }
 
         public async Task<List<User>> GetUsersByUserId(List<long> userIds, string token)
         {
             var data = JsonConvert.SerializeObject(userIds);
-            return await _httpService.PutAsync<List<User>>($"{_baseUrl} + user/", $"Bearer {token}", data);
+            return await _httpService.PutAsync<List<User>>($"{_baseUrl}/user", token, "Bearer", data);
         }
 
 

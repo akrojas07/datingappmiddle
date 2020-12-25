@@ -11,11 +11,18 @@ namespace MatchesManagement.Infrastructure.HTTPClient
 {
     public class HttpClientService : IHttpClientService
     {
-        public async Task<T> GetAsync<T>(string url, string key, string errorMessage = "")
+        public async Task<T> GetAsync<T>(string url, string key, string scheme = "", string errorMessage = "")
         {
             var httpClient = new HttpClient();
 
-            httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(key);
+            if (string.IsNullOrEmpty(scheme))
+            {
+                httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(key);
+            }
+            else
+            {
+                httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(scheme, key);
+            }
 
             var result = await httpClient.GetAsync(url);
 
@@ -33,11 +40,18 @@ namespace MatchesManagement.Infrastructure.HTTPClient
 
         }
 
-        public async Task<T> PutAsync<T>(string url, string key, string data, string errorMessage = "")
+        public async Task<T> PutAsync<T>(string url, string key, string data, string scheme = "", string errorMessage = "")
         {
             var httpClient = new HttpClient();
 
-            httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(key);
+            if (string.IsNullOrEmpty(scheme))
+            {
+                httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(key);
+            }
+            else
+            {
+                httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(scheme, key);
+            }
 
             var body = new StringContent(data, Encoding.UTF8, "application/json");
 
