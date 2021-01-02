@@ -17,7 +17,7 @@ namespace MatchesManagement.Infrastructure.Persistence.Repositories
 
         public MatchesRepository(IConfiguration config)
         {
-            _connectionString = config.GetSection("ConnectionString: DatingDb").Value;
+            _connectionString = config.GetSection("ConnectionString:DatingDb").Value;
         }
 
         public async Task<List<Matches>> GetAllMatches()

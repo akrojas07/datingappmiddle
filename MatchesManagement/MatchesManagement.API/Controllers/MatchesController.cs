@@ -27,19 +27,24 @@ namespace MatchesManagement.API.Controllers
         [Route("newmatches/{userId}")]
         public async Task<IActionResult> GetNewMatches(long userId, [FromQuery]string location)
         {
-            //validate input
-            if(userId <= 0)
+            //validate inputs
+            if (userId <= 0)
             {
                 return StatusCode(400);
             }
 
-            var token = ""; 
+            if (string.IsNullOrEmpty(location))
+            {
+                return StatusCode(400);
+            }
+
+            var token = "";
 
             if (Request.Headers.ContainsKey("Authorization"))
             {
                 var jwt = (Request.Headers.FirstOrDefault(s => s.Key.Equals("Authorization"))).Value;
 
-                if(jwt.Count <= 0)
+                if (jwt.Count <= 0)
                 {
                     return StatusCode(400);
                 }
@@ -48,11 +53,11 @@ namespace MatchesManagement.API.Controllers
             }
 
             try
-             {
+            {
                 var matches = await _matchesServices.GetNewPotentialMatches(location, token, userId);
                 return StatusCode(200, matches);
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 return StatusCode(500, e.Message);
             }
@@ -60,8 +65,8 @@ namespace MatchesManagement.API.Controllers
         }
 
         [HttpGet]
-        [Route("match/{id}")]
-        public async Task<IActionResult> GetMatchesByMatchId(long matchId)
+        [Route("match/{matchId}")]
+        public async Task<IActionResult> GetMatchesByMatchId([FromRoute] long matchId)
         {
             if(matchId <= 0)
             {
@@ -134,6 +139,14 @@ namespace MatchesManagement.API.Controllers
                 return StatusCode(400);
             }
 
+            foreach(var match in upsertMatchesRequest.UpsertMatches)
+            {
+                if(match.FirstUserId <= 0 || match.SecondUserId <= 0 || match.Liked == null)
+                {
+                    return StatusCode(400);
+                }
+            }
+
             var token = "";
 
             if (Request.Headers.ContainsKey("Authorization"))
@@ -162,9 +175,12 @@ namespace MatchesManagement.API.Controllers
                         Liked = upsertMatch.Liked,
                         Matched = upsertMatch.Matched
                     };
+
+                    domainMatches.Add(domainMatch);
                 }
 
                 await _matchesServices.UpsertMatches(domainMatches, token);
+                return StatusCode(200);
             }
             catch (Exception e)
             {

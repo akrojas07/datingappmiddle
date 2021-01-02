@@ -29,7 +29,7 @@ namespace MatchesManagement.Domain.Services
         public async Task<Match> GetMatchByMatchId(long matchId, string token)
         {
             //validate input
-            if(matchId <0)
+            if(matchId <= 0)
             {
                 throw new ArgumentException();
             }
@@ -60,7 +60,7 @@ namespace MatchesManagement.Domain.Services
         public async Task<List<Match>> GetMatchesByUserId(long userId, string token)
         {
             //validate input
-            if(userId < 0)
+            if(userId <= 0)
             {
                 throw new ArgumentException();
             }
@@ -68,7 +68,7 @@ namespace MatchesManagement.Domain.Services
             var dbMatches = await _matchesRepository.GetMatchesByUserId(userId);
 
             //validate db matches are not empty
-            if(dbMatches == null || dbMatches.Count < 0)
+            if(dbMatches == null || dbMatches.Count <= 0)
             {
                 throw new Exception();
             }
@@ -106,6 +106,11 @@ namespace MatchesManagement.Domain.Services
             //call microservice method
             var microserviceUsers = await _userServices.GetUsersByLocation(location, token);
 
+            if(microserviceUsers.Count <= 0 || microserviceUsers == null)
+            {
+                throw new Exception();
+            }
+
             //map micro service users to domain users
             foreach(var msUser in microserviceUsers)
             {
@@ -131,7 +136,13 @@ namespace MatchesManagement.Domain.Services
         public async Task UpsertMatches(List<Match> matches, string token)
         {
             //validate matches list is not null or empty
-            if(matches == null || matches.Count < 0)
+            if(matches == null || matches.Count <= 0)
+            {
+                throw new ArgumentException();
+            }
+
+            //validate token is not empty
+            if(string.IsNullOrEmpty(token))
             {
                 throw new ArgumentException();
             }
@@ -142,6 +153,10 @@ namespace MatchesManagement.Domain.Services
             //validate matches
             var validatedMatches = await UpsertValidation(matches, token);
 
+            if(validatedMatches.Count <= 0)
+            {
+                throw new Exception();
+            }
             //map domain matches to db matches
             foreach(var match in validatedMatches)
             {
@@ -161,10 +176,18 @@ namespace MatchesManagement.Domain.Services
         private async Task<List<Match>> UpsertValidation(List<Match> matches, string token)
         {
             //validate matches list
-            if (matches == null || matches.Count < 0)
+            if (matches == null || matches.Count <= 0)
             {
                 throw new ArgumentException();
             }
+
+            //validate token is not empty
+            if(string.IsNullOrEmpty(token))
+            {
+                throw new ArgumentException();
+            }
+
+            var matchesToRemove = new List<Match>();
 
             //loop through the matches 
             foreach(var match in matches)
@@ -174,8 +197,9 @@ namespace MatchesManagement.Domain.Services
                 {
                     //set value of user ids to validate
                     var userIds = new List<long>();
-                    userIds.Add(match.SecondUserId);
                     userIds.Add(match.FirstUserId);
+                    userIds.Add(match.SecondUserId);
+
 
                     //pull user from db
                     var users = await _userServices.GetUsersByUserId(userIds, token);
@@ -183,7 +207,7 @@ namespace MatchesManagement.Domain.Services
                     //if users list is less than 2 or null
                     if(users.Count < 2 || users == null)
                     {
-                        matches.Remove(match);
+                        matchesToRemove.Add(match);
 
                         //move on to next match
                         continue;
@@ -196,7 +220,7 @@ namespace MatchesManagement.Domain.Services
                     if(dbMatch == null || dbMatch.Matched == false)
                     {
                         //if match doesn't exist
-                        matches.Remove(match);
+                        matchesToRemove.Add(match);
 
                         //move onto next match
                         continue;
@@ -216,6 +240,11 @@ namespace MatchesManagement.Domain.Services
                         match.Matched = false;
                     }
                 }
+            }
+
+            foreach(var match in matchesToRemove)
+            {
+                matches.Remove(match);
             }
 
             return matches;

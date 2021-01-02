@@ -28,8 +28,9 @@ namespace MatchesManagement.Infrastructure.UserManagementAPI.Services
 
         public async Task<List<User>> GetUsersByUserId(List<long> userIds, string token)
         {
-            var data = JsonConvert.SerializeObject(userIds);
-            return await _httpService.PutAsync<List<User>>($"{_baseUrl}/user", token, "Bearer", data);
+            var data = new { UserIds = userIds };
+
+            return await _httpService.PutAsync<List<User>>($"{_baseUrl}/user", token, JsonConvert.SerializeObject(data), "Bearer" );
         }
 
 
