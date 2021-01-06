@@ -9,6 +9,9 @@ using System.Threading.Tasks;
 using MatchesManagement.Domain.AdoMapper;
 using MatchesManagement.Infrastructure.Persistence.Entities;
 
+using ApiUser = MatchesManagement.Infrastructure.UserManagementAPI.Models.User;
+
+
 namespace MatchesManagement.Domain.Services
 {
     public class MatchesServices : IMatchesServices
@@ -79,7 +82,11 @@ namespace MatchesManagement.Domain.Services
             //map db matches to domain matches
             foreach(var dbMatch in dbMatches)
             {
-                domainMatches.Add(AdoMatchesMapper.DbEntityToCoreModel(dbMatch));
+                if(dbMatch.Matched != false || dbMatch.Matched == null)
+                {
+                    domainMatches.Add(AdoMatchesMapper.DbEntityToCoreModel(dbMatch));
+                }
+                continue;
             }
 
             return domainMatches; 
@@ -103,15 +110,49 @@ namespace MatchesManagement.Domain.Services
             //create new list of domain users
             List<User> users = new List<User>();
 
-            //call microservice method
+            //call microservice method to pull users by location
             var microserviceUsers = await _userServices.GetUsersByLocation(location, token);
 
+            //call get matches by user Id method
+            var existingMatches = await _matchesRepository.GetMatchesByUserId(userId);
+
+            //validate calls to microservice are not null or empty
             if(microserviceUsers.Count <= 0 || microserviceUsers == null)
             {
                 throw new Exception();
             }
 
-            //map micro service users to domain users
+            var matchesToRemove = new List<ApiUser>();
+
+            //if matches exist in db
+            if(existingMatches.Count > 0 || existingMatches != null)
+            {
+                //remove from new matches list 
+                foreach(var eMatch in existingMatches)
+                {
+                    foreach(var newMatch in microserviceUsers)
+                    {
+                        if(newMatch.Id == eMatch.FirstUserId)
+                        {
+                            matchesToRemove.Add(newMatch);
+                            continue;
+                        }
+                        else if (newMatch.Id == eMatch.SecondUserId)
+                        {
+                            matchesToRemove.Add(newMatch);
+                            continue;
+                        }
+                    }
+                }
+            }
+
+            //remove existing matches
+            foreach(var eMatch in matchesToRemove)
+            {
+                microserviceUsers.Remove(eMatch);
+            }
+
+            //map remaining micro service users to domain users
             foreach(var msUser in microserviceUsers)
             {
                 //validate current user isn't being included in matches list
@@ -228,8 +269,8 @@ namespace MatchesManagement.Domain.Services
 
                     //if db match exists, compare to value of domain match
                     //if they match, set "matched" equal to value of liked
-                    //if they don't match, set to opposite value 
-                    match.Matched = (match.Liked == dbMatch.Liked) ? match.Liked : !match.Liked;
+                    //if they don't match, set to false 
+                    match.Matched = (match.Liked == dbMatch.Liked) ? match.Liked : false;
                 }
 
                 //if match doesnt exist in db, and liked field is false, set match to false

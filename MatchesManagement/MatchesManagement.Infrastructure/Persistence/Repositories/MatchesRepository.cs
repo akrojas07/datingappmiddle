@@ -82,7 +82,7 @@ namespace MatchesManagement.Infrastructure.Persistence.Repositories
 
                 foreach(var match in matches)
                 {
-                    dataTable.Rows.Add(match.MatchId, match.FirstUserId, match.SecondUserId, match.Liked, match.Matched);
+                    dataTable.Rows.Add(match.Id, match.FirstUserId, match.SecondUserId, match.Liked, match.Matched);
                 }
 
                 var parameter = new DynamicParameters();

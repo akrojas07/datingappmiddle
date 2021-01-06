@@ -13,7 +13,7 @@ namespace MatchesManagement.Domain.AdoMapper
         {
             var coreModel = new CoreModel() 
             { 
-                Id = dbEntity.MatchId,
+                Id = dbEntity.Id,
                 FirstUserId = dbEntity.FirstUserId,
                 SecondUserId = dbEntity.SecondUserId,
                 Liked = dbEntity.Liked,
@@ -27,7 +27,7 @@ namespace MatchesManagement.Domain.AdoMapper
         {
             var dbEntity = new DbEntity()
             {
-                MatchId = coreModel.Id,
+                Id = coreModel.Id,
                 FirstUserId = coreModel.FirstUserId,
                 SecondUserId = coreModel.SecondUserId,
                 Liked = coreModel.Liked,
