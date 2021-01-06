@@ -37,7 +37,7 @@ namespace MatchesManagement.Tests.DomainTests
             _matchesRepository.Setup(u => u.GetMatchByMatchId(It.IsAny<long>()))
                 .ReturnsAsync(new Matches()
                 {
-                    MatchId = 1, FirstUserId = 1, SecondUserId = 2, Liked = true, Matched = false
+                    Id = 1, FirstUserId = 1, SecondUserId = 2, Liked = true, Matched = false
                 });
 
             var matchesServices = new MatchesServices(_matchesRepository.Object, _userServices.Object);
@@ -76,7 +76,7 @@ namespace MatchesManagement.Tests.DomainTests
             _matchesRepository.Setup(m => m.GetMatchesByUserId(It.IsAny<long>()))
                 .ReturnsAsync(new List<Matches>() 
                 {
-                    { new Matches(){MatchId = 1, FirstUserId = 1, SecondUserId = 2, Liked = true, Matched = true } }
+                    { new Matches(){Id = 1, FirstUserId = 1, SecondUserId = 2, Liked = true, Matched = true } }
                 });
 
             var matchesServices = new MatchesServices(_matchesRepository.Object, _userServices.Object);
@@ -155,7 +155,7 @@ namespace MatchesManagement.Tests.DomainTests
             _matchesRepository.Setup(m => m.GetMatchByMatchId(It.IsAny<long>()))
                 .ReturnsAsync(new Matches() 
                 {
-                    MatchId = 1,
+                    Id = 1,
                     FirstUserId = 1,
                     SecondUserId = 2,
                     Liked = true
