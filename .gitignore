@@ -16,3 +16,19 @@ UserManagement/.vs/
 UserManagement/UserManagement.Domain/bin/
 
 UserManagement/UserManagement.Domain/obj/
+
+MatchesManagement/.vs/
+
+MatchesManagement/MatchesManagement.API/bin/
+
+MatchesManagement/MatchesManagement.API/obj/
+
+MatchesManagement/MatchesManagement.Domain/bin/
+
+MatchesManagement/MatchesManagement.Domain/obj/
+
+MatchesManagement/MatchesManagement.Infrastructure/bin/
+
+MatchesManagement/MatchesManagement.Infrastructure/obj/
+
+MatchesManagement/MatchesManagement.Tests/obj/

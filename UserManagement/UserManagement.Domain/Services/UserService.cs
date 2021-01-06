@@ -53,7 +53,7 @@ namespace UserManagement.Domain.Services
                     var newDomainUser = EfUserMapper.DbEntityToCoreModel(createdUser);
 
                     //map photo id to photo for domain user
-                    if(createdUser.PhotoId != null)
+                    if(createdUser.PhotoId != null && createdUser.PhotoId > 0)
                     {
                         var photo = await _stockPhoto.GetPhotoById((long)createdUser.PhotoId);
                         newDomainUser.Photo = new DomainPhoto() { Id = photo.Id, URL = photo.Source.Medium};
@@ -127,7 +127,7 @@ namespace UserManagement.Domain.Services
             //convert db user to domain user
             user = EfUserMapper.DbEntityToCoreModel(dbuser);
 
-            if (dbuser.PhotoId != null)
+            if (dbuser.PhotoId != null && dbuser.PhotoId > 0)
             {
                 var photo = await _stockPhoto.GetPhotoById((long)dbuser.PhotoId);
                 user.Photo = new DomainPhoto() { Id = photo.Id, URL = photo.Source.Medium };
@@ -135,6 +135,46 @@ namespace UserManagement.Domain.Services
 
             return user;
 
+        }
+
+        /// <summary>
+        /// Service method to pull users by location
+        /// </summary>
+        /// <param name="location">Location as string</param>
+        /// <returns>List of Domain User Models</returns>
+        public async Task<List<UserModel>> GetUsersByLocation(string location)
+        {
+            //validate location input 
+            if(string.IsNullOrEmpty(location))
+            {
+                throw new ArgumentException("Location not provided");
+            }
+            //create empty list of domain users 
+            List<UserModel> usersByLocation = new List<UserModel>();
+
+            var dbUsersList = await _userRepository.GetUsersByLocation(location);
+
+            //validate db users list is not empty
+            if(dbUsersList == null || dbUsersList.Count < 0)
+            {
+                throw new Exception("Users not found");
+            }
+
+            //map db users to domain list
+            foreach(var dbUser in dbUsersList)
+            {
+                var user = EfUserMapper.DbEntityToCoreModel(dbUser);
+
+                if (dbUser.PhotoId != null && dbUser.PhotoId > 0)
+                {
+                    var picture = await _stockPhoto.GetPhotoById((long)dbUser.PhotoId);
+                    user.Photo = new DomainPhoto() { Id = picture.Id, URL = picture.Source.Medium };
+                }
+
+                usersByLocation.Add(user);
+            }
+
+            return usersByLocation;
         }
 
         /// <summary>
@@ -312,6 +352,10 @@ namespace UserManagement.Domain.Services
                 result = false;
             }
             else if(coreUser.Username == null)
+            {
+                result = false;
+            }
+            else if(coreUser.Location == null)
             {
                 result = false;
             }
