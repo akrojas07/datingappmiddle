@@ -197,7 +197,7 @@ namespace UserManagement.Domain.Services
                 foreach (var dbUser in dbUsers)
                 {
                     var user = EfUserMapper.DbEntityToCoreModel(dbUser);
-                    if(dbUser.PhotoId != null)
+                    if(dbUser.PhotoId != null && dbUser.PhotoId > 0)
                     {
                         var picture = await _stockPhoto.GetPhotoById((long)dbUser.PhotoId);
                         user.Photo = new DomainPhoto() { Id = picture.Id, URL = picture.Source.Medium };
@@ -251,7 +251,7 @@ namespace UserManagement.Domain.Services
             //map db user to domain user
             var domainUser = EfUserMapper.DbEntityToCoreModel(user);
 
-            if(user.PhotoId != null)
+            if(user.PhotoId != null && user.PhotoId > 0)
             {
                 var picture = await _stockPhoto.GetPhotoById((long)user.PhotoId);
                 domainUser.Photo = new DomainPhoto() { Id = picture.Id, URL = picture.Source.Medium};
