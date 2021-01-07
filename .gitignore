@@ -32,3 +32,11 @@ MatchesManagement/MatchesManagement.Infrastructure/bin/
 MatchesManagement/MatchesManagement.Infrastructure/obj/
 
 MatchesManagement/MatchesManagement.Tests/obj/
+
+ChatsManagement/ChatsManagement.Domain/bin/
+
+ChatsManagement/ChatsManagement.Domain/obj/
+
+ChatsManagement/ChatsManagement.Infrastructure/bin/
+
+ChatsManagement/ChatsManagement.Infrastructure/obj/
