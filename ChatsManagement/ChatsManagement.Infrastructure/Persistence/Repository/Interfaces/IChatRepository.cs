@@ -11,7 +11,7 @@ namespace ChatsManagement.Infrastructure.Persistence.Repository.Interfaces
         Task <List<Chat>> GetChatsByMatchId(long matchId);
 
         Task<List<Chat>> GetChatsByUserId(long userId);
-        Task AddNewChatMessageByMatchId(Chat newChat);
+        Task<long> AddNewChatMessageByMatchId(Chat newChat);
         Task DeleteExistingChatMessage(long chatId);
 
     }

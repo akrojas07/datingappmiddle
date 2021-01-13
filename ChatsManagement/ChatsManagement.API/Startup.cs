@@ -16,6 +16,11 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using ChatsManagement.Infrastructure.UserManagementAPI.Services;
+using ChatsManagement.Infrastructure.UserManagementAPI.Interfaces;
+using ChatsManagement.Infrastructure.MatchesManagementAPI.Interfaces;
+using ChatsManagement.Infrastructure.MatchesManagementAPI.Services;
+using ChatsManagement.Infrastructure.HTTPClient;
 
 namespace ChatsManagement.API
 {
@@ -53,6 +58,9 @@ namespace ChatsManagement.API
             services.AddSingleton<IChatRepository, ChatRepository>();
 
             services.AddTransient<IChatServices, ChatServices>();
+            services.AddTransient<IUserService, UserService>();
+            services.AddTransient<IMatchServices, MatchServices>();
+            services.AddTransient<IHttpClientService, HttpClientService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

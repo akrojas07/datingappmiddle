@@ -14,12 +14,18 @@ namespace ChatsManagement.Infrastructure.Persistence.Repository
         /// </summary>
         /// <param name="newChat">Chat Entity</param>
         /// <returns>Completed Task</returns>
-        public async Task AddNewChatMessageByMatchId(Chat newChat)
+        public async Task<long> AddNewChatMessageByMatchId(Chat newChat)
         {
-            using(var context = new DatingAppContext())
+            using (var context = new DatingAppContext())
             {
                 context.Chats.Add(newChat);
-                await context.SaveChangesAsync(); 
+                await context.SaveChangesAsync();
+
+                var chat = await context.Chats.Where(c => c.FirstUserId == newChat.FirstUserId && c.SecondUserId == newChat.SecondUserId)
+                    .OrderBy(c => c.Id)
+                    .LastOrDefaultAsync();
+
+                return chat.Id;
             }
 
         }
@@ -31,7 +37,7 @@ namespace ChatsManagement.Infrastructure.Persistence.Repository
         /// <returns>Task complete</returns>
         public async Task DeleteExistingChatMessage(long chatId)
         {
-            using(var context = new DatingAppContext())
+            using (var context = new DatingAppContext())
             {
                 //pull existing chat 
                 var chat = await context.Chats.FirstOrDefaultAsync(c => c.Id == chatId);
@@ -39,6 +45,7 @@ namespace ChatsManagement.Infrastructure.Persistence.Repository
                 //remove
                 context.Chats.Remove(chat);
                 await context.SaveChangesAsync();
+
             }
         }
 
@@ -51,7 +58,7 @@ namespace ChatsManagement.Infrastructure.Persistence.Repository
         {
             using (var context = new DatingAppContext())
             {
-                return await context.Chats.Where(c => c.MatchId == matchId ).ToListAsync();
+                return await context.Chats.Where(c => c.MatchId == matchId).ToListAsync();
             }
         }
 
@@ -62,7 +69,7 @@ namespace ChatsManagement.Infrastructure.Persistence.Repository
         /// <returns>List of Chat objects </returns>
         public async Task<List<Chat>> GetChatsByUserId(long userId)
         {
-            using(var context = new DatingAppContext())
+            using (var context = new DatingAppContext())
             {
                 return await context.Chats.Where(c => c.FirstUserId == userId || c.SecondUserId == userId).ToListAsync();
             }

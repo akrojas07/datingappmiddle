@@ -43,7 +43,7 @@ namespace MatchesManagement.Domain.Services
             //validate db match is not empty
             if(dbMatch == null)
             {
-                throw new Exception();
+                throw new Exception("No Matches exist");
             }
 
             //map db match to domain match

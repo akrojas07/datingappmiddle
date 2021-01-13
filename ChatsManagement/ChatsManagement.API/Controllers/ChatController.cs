@@ -33,6 +33,20 @@ namespace ChatsManagement.API.Controllers
                 return StatusCode(400, "Bad Request");
             }
 
+            var token = "";
+
+            if (Request.Headers.ContainsKey("Authorization"))
+            {
+                var jwt = (Request.Headers.FirstOrDefault(s => s.Key.Equals("Authorization"))).Value;
+
+                if (jwt.Count <= 0)
+                {
+                    return StatusCode(400);
+                }
+
+                token = jwt[0].Replace("Bearer ", "");
+            }
+
             try
             {
                 DomainChat domainChat = new DomainChat()
@@ -44,8 +58,8 @@ namespace ChatsManagement.API.Controllers
                     DateSent = DateTime.Now
                 };
 
-                await _chatServices.AddNewChatMessageByMatchId(domainChat);
-                return StatusCode(201);
+                var chatId = await _chatServices.AddNewChatMessageByMatchId(domainChat, token);
+                return StatusCode(201, chatId);
 
             }
             catch(Exception e)
@@ -86,9 +100,23 @@ namespace ChatsManagement.API.Controllers
                 return StatusCode(400, "Bad Request");
             }
 
+            var token = "";
+
+            if (Request.Headers.ContainsKey("Authorization"))
+            {
+                var jwt = (Request.Headers.FirstOrDefault(s => s.Key.Equals("Authorization"))).Value;
+
+                if (jwt.Count <= 0)
+                {
+                    return StatusCode(400);
+                }
+
+                token = jwt[0].Replace("Bearer ", "");
+            }
+
             try
             {
-                var chats = await _chatServices.GetChatsByMatchId(matchId);
+                var chats = await _chatServices.GetChatsByMatchId(matchId, token);
                 return StatusCode(200, chats);
             }
             catch(Exception e)
@@ -106,9 +134,23 @@ namespace ChatsManagement.API.Controllers
                 return StatusCode(400, "Bad Request");
             }
 
+            var token = "";
+
+            if (Request.Headers.ContainsKey("Authorization"))
+            {
+                var jwt = (Request.Headers.FirstOrDefault(s => s.Key.Equals("Authorization"))).Value;
+
+                if (jwt.Count <= 0)
+                {
+                    return StatusCode(400);
+                }
+
+                token = jwt[0].Replace("Bearer ", "");
+            }
+
             try
             {
-                var chats = await _chatServices.GetChatsByUserId(userId);
+                var chats = await _chatServices.GetChatsByUserId(userId, token);
                 return StatusCode(200, chats);
             }
             catch(Exception e)

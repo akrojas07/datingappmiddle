@@ -6,16 +6,22 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 using ChatsManagement.Domain.Mapper;
+using ChatsManagement.Infrastructure.UserManagementAPI.Interfaces;
+using ChatsManagement.Infrastructure.MatchesManagementAPI.Interfaces;
 
 namespace ChatsManagement.Domain.Services
 {
     public class ChatServices : IChatServices
     {
         private readonly IChatRepository _chatRepository;
+        private readonly IUserService _userService;
+        private readonly IMatchServices _matchServices;
 
-        public ChatServices(IChatRepository chatRepository)
+        public ChatServices(IChatRepository chatRepository, IUserService userService, IMatchServices matchServices)
         {
             _chatRepository = chatRepository;
+            _userService = userService;
+            _matchServices = matchServices;
         }
 
         /// <summary>
@@ -23,16 +29,26 @@ namespace ChatsManagement.Domain.Services
         /// </summary>
         /// <param name="newChat">Domain Chat object</param>
         /// <returns>Task Complete</returns>
-        public async Task AddNewChatMessageByMatchId(DomainChat newChat)
+        public async Task<long> AddNewChatMessageByMatchId(DomainChat newChat, string token)
         {
             if(newChat == null)
             {
                 throw new ArgumentException();
             }
 
+            //validate match exists 
+            var existingMatch = await _matchServices.GetMatchByMatchId(newChat.MatchId, token);
+
+            if (existingMatch == null)
+            {
+                throw new Exception("Match does not exist");
+            }
+
             var dbChat = EFChatsMapper.DomainToDbChat(newChat);
 
-            await _chatRepository.AddNewChatMessageByMatchId(dbChat);
+            var chatId = await _chatRepository.AddNewChatMessageByMatchId(dbChat);
+
+            return chatId;
         }
 
         /// <summary>
@@ -57,7 +73,7 @@ namespace ChatsManagement.Domain.Services
         /// </summary>
         /// <param name="matchId">Long Match Id</param>
         /// <returns>List of Domain Chats</returns>
-        public async Task<List<DomainChat>> GetChatsByMatchId(long matchId)
+        public async Task<List<DomainChat>> GetChatsByMatchId(long matchId, string token)
         {
             //validate inputs 
             if(matchId <= 0)
@@ -66,6 +82,14 @@ namespace ChatsManagement.Domain.Services
             }
 
             List<DomainChat> domainChats = new List<DomainChat>();
+
+            //validate matchId from match service
+            var existingMatch = await _matchServices.GetMatchByMatchId(matchId, token);
+
+            if(existingMatch == null)
+            {
+                throw new Exception("Match does not exist");
+            }
 
             //pull chats from db
             var dbChats = await _chatRepository.GetChatsByMatchId(matchId);
@@ -84,13 +108,23 @@ namespace ChatsManagement.Domain.Services
 
         }
 
-        public async Task<List<DomainChat>> GetChatsByUserId(long userId)
+        public async Task<List<DomainChat>> GetChatsByUserId(long userId, string token)
         {
             if(userId <=0)
             {
                 throw new ArgumentException();
             }
+            
             List<DomainChat> domainChats = new List<DomainChat>();
+            List<long> userIdList = new List<long>();
+            userIdList.Add(userId);
+
+            //validate user from user service
+            var existingUser = await _userService.GetUsersByUserId(userIdList, token);
+            if(existingUser.Count <= 0)
+            {
+                throw new Exception("User does not exist");
+            }
 
             //pull chats from db
             var dbChats = await _chatRepository.GetChatsByUserId(userId);
