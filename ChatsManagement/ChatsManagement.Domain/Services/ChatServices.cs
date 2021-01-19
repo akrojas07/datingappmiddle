@@ -105,6 +105,12 @@ namespace ChatsManagement.Domain.Services
                 //pull user information based on user id list
                 List<UMUser> userInfoList = await _userService.GetUsersByUserId(userIdList, token);
 
+                //validate list returned from user service
+                if(userInfoList == null)
+                {
+                    throw new Exception("Users not found");
+                }
+
                 //loop through return db chats and user information list to map db chats to domain chats with user information
                 foreach (var dbChat in dbChats)
                 {
@@ -115,12 +121,22 @@ namespace ChatsManagement.Domain.Services
                     domainChats.Add(chat);
                 }
             }
+            else
+            {
+                throw new Exception("Chats not found");
+            }
 
             //return list of domain chats
             return domainChats;
 
         }
 
+        /// <summary>
+        /// Service method to pull chats by user id
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <param name="token"></param>
+        /// <returns>List of Domain chats</returns>
         public async Task<List<DomainChat>> GetChatsByUserId(long userId, string token)
         {
             if (userId <= 0)
@@ -136,7 +152,7 @@ namespace ChatsManagement.Domain.Services
             //validate user
             var existingUser = await _userService.GetUsersByUserId(userIdList, token);
 
-            if (existingUser.Count <= 0)
+            if (existingUser == null || existingUser.Count <= 0)
             {
                 throw new Exception("User does not exist");
             }
@@ -163,12 +179,22 @@ namespace ChatsManagement.Domain.Services
                     domainChats.Add(chat);
                 }
             }
+            else
+            {
+                throw new Exception("No Chats found");
+            }
 
             //return list of domain chats
             return domainChats;
 
         }
 
+        /// <summary>
+        /// Private service method to validate list of provided chats
+        /// </summary>
+        /// <param name="dbChats"></param>
+        /// <param name="userId"></param>
+        /// <returns>List of user ids</returns>
         private List<long> ValidateUsers(List<Chat> dbChats, long userId = 0)
         {
             List<long> userIdList = new List<long>();

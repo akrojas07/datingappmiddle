@@ -46,3 +46,7 @@ ChatsManagement/ChatsManagement.API/bin/
 ChatsManagement/ChatsManagement.API/obj/
 
 ChatsManagement/.vs/
+
+ChatsManagement/ChatsManagement.Tests/bin/
+
+ChatsManagement/ChatsManagement.Tests/obj/
