@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using ChatsManagement.Domain.Models;
 using ChatsManagement.Infrastructure.Persistence.Entities;
+using UMuser = ChatsManagement.Infrastructure.UserManagementAPI.Models.User;
 
 namespace ChatsManagement.Domain.Mapper
 {
@@ -19,6 +20,7 @@ namespace ChatsManagement.Domain.Mapper
                 Message = dbChat.Message,
                 DateSent = (DateTime)dbChat.DateSent
             };
+
             return domainChat;
         }
 

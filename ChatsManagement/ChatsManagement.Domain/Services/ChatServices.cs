@@ -3,11 +3,13 @@ using ChatsManagement.Domain.Services.Interfaces;
 using ChatsManagement.Infrastructure.Persistence.Repository.Interfaces;
 using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 using ChatsManagement.Domain.Mapper;
 using ChatsManagement.Infrastructure.UserManagementAPI.Interfaces;
 using ChatsManagement.Infrastructure.MatchesManagementAPI.Interfaces;
+using ChatsManagement.Infrastructure.Persistence.Entities;
+using UMUser = ChatsManagement.Infrastructure.UserManagementAPI.Models.User;
+using System.Linq;
 
 namespace ChatsManagement.Domain.Services
 {
@@ -31,7 +33,7 @@ namespace ChatsManagement.Domain.Services
         /// <returns>Task Complete</returns>
         public async Task<long> AddNewChatMessageByMatchId(DomainChat newChat, string token)
         {
-            if(newChat == null)
+            if (newChat == null)
             {
                 throw new ArgumentException();
             }
@@ -59,7 +61,7 @@ namespace ChatsManagement.Domain.Services
 
         public async Task DeleteExistingChatMessage(long chatId)
         {
-            if(chatId <= 0)
+            if (chatId <= 0)
             {
                 throw new ArgumentException();
             }
@@ -76,7 +78,7 @@ namespace ChatsManagement.Domain.Services
         public async Task<List<DomainChat>> GetChatsByMatchId(long matchId, string token)
         {
             //validate inputs 
-            if(matchId <= 0)
+            if (matchId <= 0)
             {
                 throw new ArgumentException();
             }
@@ -86,7 +88,7 @@ namespace ChatsManagement.Domain.Services
             //validate matchId from match service
             var existingMatch = await _matchServices.GetMatchByMatchId(matchId, token);
 
-            if(existingMatch == null)
+            if (existingMatch == null)
             {
                 throw new Exception("Match does not exist");
             }
@@ -94,12 +96,23 @@ namespace ChatsManagement.Domain.Services
             //pull chats from db
             var dbChats = await _chatRepository.GetChatsByMatchId(matchId);
 
-            //if chats exist, map db chats to domain chats 
-            if(dbChats != null && dbChats.Count > 0)
+            //if chats exist, validate users exist
+            if (dbChats != null && dbChats.Count > 0)
             {
-                foreach(var dbChat in dbChats)
+                //validate users
+                var userIdList = ValidateUsers(dbChats);
+
+                //pull user information based on user id list
+                List<UMUser> userInfoList = await _userService.GetUsersByUserId(userIdList, token);
+
+                //loop through return db chats and user information list to map db chats to domain chats with user information
+                foreach (var dbChat in dbChats)
                 {
-                    domainChats.Add(EFChatsMapper.DbToDomainChat(dbChat));
+                    var chat = EFChatsMapper.DbToDomainChat(dbChat);
+
+                    chat.FirstUsername = UserManagementToChatUserMapper.UMUserToDomainChat(userInfoList, chat.FirstUserId);
+                    chat.SecondUsername = UserManagementToChatUserMapper.UMUserToDomainChat(userInfoList, chat.SecondUserId);
+                    domainChats.Add(chat);
                 }
             }
 
@@ -110,18 +123,20 @@ namespace ChatsManagement.Domain.Services
 
         public async Task<List<DomainChat>> GetChatsByUserId(long userId, string token)
         {
-            if(userId <=0)
+            if (userId <= 0)
             {
                 throw new ArgumentException();
             }
-            
+
             List<DomainChat> domainChats = new List<DomainChat>();
             List<long> userIdList = new List<long>();
+
             userIdList.Add(userId);
 
-            //validate user from user service
+            //validate user
             var existingUser = await _userService.GetUsersByUserId(userIdList, token);
-            if(existingUser.Count <= 0)
+
+            if (existingUser.Count <= 0)
             {
                 throw new Exception("User does not exist");
             }
@@ -129,18 +144,57 @@ namespace ChatsManagement.Domain.Services
             //pull chats from db
             var dbChats = await _chatRepository.GetChatsByUserId(userId);
 
-            //if chats exist, map db chats to domain chats 
+            //if chats exist, validate users exist
             if (dbChats != null && dbChats.Count > 0)
             {
+                //validate users
+                userIdList = ValidateUsers(dbChats, userId);
+
+                //pull user information based on user id list
+                List<UMUser> userInfoList = await _userService.GetUsersByUserId(userIdList, token);
+
+                //loop through return db chats and user information list to map db chats to domain chats with user information
                 foreach (var dbChat in dbChats)
                 {
-                    domainChats.Add(EFChatsMapper.DbToDomainChat(dbChat));
+                    var chat = EFChatsMapper.DbToDomainChat(dbChat);
+
+                    chat.FirstUsername = UserManagementToChatUserMapper.UMUserToDomainChat(userInfoList, chat.FirstUserId);
+                    chat.SecondUsername = UserManagementToChatUserMapper.UMUserToDomainChat(userInfoList, chat.SecondUserId);
+                    domainChats.Add(chat);
                 }
             }
 
             //return list of domain chats
             return domainChats;
 
+        }
+
+        private List<long> ValidateUsers(List<Chat> dbChats, long userId = 0)
+        {
+            List<long> userIdList = new List<long>();
+
+            if(userId > 0)
+            {
+                userIdList.Add(userId);
+            }
+
+            foreach (var dbChat in dbChats)
+            {
+                if (dbChat.FirstUserId != userId && !userIdList.Any(id => id == dbChat.FirstUserId))
+                {
+                    userIdList.Add(dbChat.FirstUserId);
+                }
+                
+                if (dbChat.SecondUserId != userId && !userIdList.Any(id => id == dbChat.SecondUserId))
+                {
+                    userIdList.Add(dbChat.SecondUserId);
+                }
+
+                    continue;
+
+            }
+
+            return userIdList;
         }
     }
 }

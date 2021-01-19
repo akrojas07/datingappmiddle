@@ -9,7 +9,9 @@ namespace ChatsManagement.Domain.Models
         public long Id { get; set; }
         public long MatchId { get; set; }
         public long FirstUserId { get; set; }
+        public string FirstUsername { get; set; }
         public long SecondUserId { get; set; }
+        public string SecondUsername { get; set; }
         public string Message { get; set; }
         public DateTime DateSent { get; set; }
     }
