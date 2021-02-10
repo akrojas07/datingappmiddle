@@ -202,6 +202,10 @@ namespace UserManagement.Domain.Services
                         var picture = await _stockPhoto.GetPhotoById((long)dbUser.PhotoId);
                         user.Photo = new DomainPhoto() { Id = picture.Id, URL = picture.Source.Medium };
                     }
+                    else
+                    {
+                        user.Photo = new DomainPhoto();
+                    }
 
                     allUsers.Add(user);
                 }
